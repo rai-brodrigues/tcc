@@ -77,16 +77,14 @@ if ($erro) {
 						</a>
 					</div>
 
-					<div class="text-center p-t-136">
-						<a class="txt2" href="#">
-							Criar minha conta
-							<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
-						</a>
-					</div>
 				</form>
 			</div>
 		</div>
 	</div>
+	<div class="text-center mt-3">
+    Não tem uma conta?
+    <a href="../cadastro.php">Cadastre-se aqui</a>
+</div>
 	
 	
 

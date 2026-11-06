@@ -2,7 +2,7 @@
 
 session_start();
 
-include('painel/conexao.php');
+require_once __DIR__ . '/painel/conexao.php';
 
 if (
     empty($_POST['email_operador']) ||

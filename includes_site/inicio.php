@@ -26,8 +26,6 @@
       color: #fff;
     }
 
-    
-
     .contato-topo {
       width: 100%;
       background: #000;
@@ -63,12 +61,9 @@
     }
 
     .email:hover {
-      background: #ff3c00;
+      background: #e13030;
       transform: translateY(-3px);
     }
-
-
-
 
     .carrossel {
       width: 100%;
@@ -96,7 +91,7 @@
     }
 
     .titulo span {
-      color: #ff3c00;
+      color: #e13030;
     }
 
     .slider {
@@ -156,9 +151,6 @@
       color: #fff;
     }
 
-
-
-
     .seta {
       position: absolute;
       top: 50%;
@@ -188,9 +180,6 @@
       right: 30px;
     }
 
-
-  
-
     .indicadores {
       display: flex;
       justify-content: center;
@@ -208,12 +197,9 @@
     }
 
     .indicador.ativo {
-      background: #ff3c00;
+      background: #e13030;
       transform: scale(1.2);
     }
-
-
-   
 
     .sobre {
       width: 100%;
@@ -256,7 +242,7 @@
     }
 
     .sobre-texto h2 span {
-      color: #ff3c00;
+      color: #e13030;
     }
 
     .sobre-texto p {
@@ -270,7 +256,7 @@
       display: inline-block;
       margin-top: 15px;
       padding: 14px 28px;
-      background: #ff3c00;
+      background: #e13030;
       color: #fff;
       text-decoration: none;
       font-weight: bold;
@@ -284,9 +270,6 @@
       color: #111;
       transform: translateY(-3px);
     }
-
-
-   
 
     .beneficios {
       padding: 80px 20px;
@@ -305,7 +288,7 @@
     }
 
     .secao-titulo h2 span {
-      color: #ff3c00;
+      color: #e13030;
     }
 
     .secao-titulo p {
@@ -332,13 +315,13 @@
 
     .beneficio:hover {
       transform: translateY(-8px);
-      border-color: #ff3c00;
-      box-shadow: 0 10px 30px rgba(255, 60, 0, 0.15);
+      border-color: #e13030;
+      box-shadow: 0 10px 30px rgba(225, 48, 48, 0.15);
     }
 
     .beneficio i {
       font-size: 45px;
-      color: #ff3c00;
+      color: #e13030;
       margin-bottom: 20px;
     }
 
@@ -351,9 +334,6 @@
       color: #aaa;
       line-height: 1.6;
     }
-
-
-    
 
     .chamada {
       padding: 100px 20px;
@@ -374,7 +354,7 @@
     }
 
     .chamada h2 span {
-      color: #ff3c00;
+      color: #e13030;
     }
 
     .chamada p {
@@ -404,9 +384,6 @@
       transform: translateY(-3px);
     }
 
-
-   
-
     footer {
       background: #000;
       padding: 30px 20px;
@@ -416,11 +393,8 @@
     }
 
     footer span {
-      color: #ff3c00;
+      color: #e13030;
     }
-
-
-
 
     @media (max-width: 768px) {
 
@@ -539,12 +513,9 @@
 
     </div>
 
-
     <div class="slider">
 
       <div class="slides" id="slides">
-
-
 
         <div class="card">
 
@@ -566,8 +537,6 @@
 
         </div>
 
-
-
         <div class="card">
 
           <img
@@ -588,8 +557,6 @@
 
         </div>
 
-
-
         <div class="card">
 
           <img
@@ -609,8 +576,6 @@
           </div>
 
         </div>
-
-
 
         <div class="card">
 
@@ -636,8 +601,6 @@
 
     </div>
 
-
-
     <button
       class="seta anterior"
       onclick="mudarSlide(-1)"
@@ -653,8 +616,6 @@
     >
       &#10095;
     </button>
-
-
 
     <div class="indicadores">
 
@@ -686,9 +647,6 @@
 
   </section>
 
-
-
-
   <section class="sobre">
 
     <div class="sobre-container">
@@ -701,7 +659,6 @@
         >
 
       </div>
-
 
       <div class="sobre-texto">
 
@@ -737,10 +694,6 @@
 
   </section>
 
-
-
-       
-
   <section class="beneficios">
 
     <div class="secao-titulo">
@@ -755,9 +708,7 @@
 
     </div>
 
-
     <div class="beneficios-grid">
-
 
       <div class="beneficio">
 
@@ -772,7 +723,6 @@
 
       </div>
 
-
       <div class="beneficio">
 
         <i class="fa-solid fa-user-tie"></i>
@@ -785,7 +735,6 @@
         </p>
 
       </div>
-
 
       <div class="beneficio">
 
@@ -800,7 +749,6 @@
 
       </div>
 
-
       <div class="beneficio">
 
         <i class="fa-solid fa-fire"></i>
@@ -814,7 +762,6 @@
 
       </div>
 
-
       <div class="beneficio">
 
         <i class="fa-solid fa-users"></i>
@@ -827,7 +774,6 @@
         </p>
 
       </div>
-
 
       <div class="beneficio">
 
@@ -845,10 +791,6 @@
     </div>
 
   </section>
-
-
-
- 
 
   <section class="chamada" id="contato">
 
@@ -876,10 +818,6 @@
 
   </section>
 
-
-
- 
-
   <script>
 
     let slideAtual = 0;
@@ -889,12 +827,10 @@
     const indicadores =
       document.querySelectorAll(".indicador");
 
-
     function atualizarSlide() {
 
       slides.style.transform =
         `translateX(-${slideAtual * 100}%)`;
-
 
       indicadores.forEach((indicador, index) => {
 
@@ -907,26 +843,21 @@
 
     }
 
-
     function mudarSlide(direcao) {
 
       slideAtual += direcao;
-
 
       if (slideAtual < 0) {
         slideAtual = 3;
       }
 
-
       if (slideAtual > 3) {
         slideAtual = 0;
       }
 
-
       atualizarSlide();
 
     }
-
 
     function irParaSlide(numero) {
 
@@ -936,8 +867,6 @@
 
     }
 
-
-
     setInterval(() => {
 
       mudarSlide(1);
@@ -945,7 +874,6 @@
     }, 5000);
 
   </script>
-
 
 </body>
 </html>
