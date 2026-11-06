@@ -6,7 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 header('Content-Type: application/json; charset=utf-8');
 
-// Verificar se o operador está conectado
 if (empty($_SESSION['usuario_id'])) {
     http_response_code(401);
     echo json_encode(['erro' => 'Você precisa fazer login.']);
@@ -21,7 +20,6 @@ $metodo = $_SERVER['REQUEST_METHOD'];
 
 try {
 
-    // LISTAR SOMENTE OS ALUNOS DO OPERADOR
     if ($metodo === 'GET') {
 
         $sql = "
@@ -53,7 +51,6 @@ try {
         exit;
     }
 
-    // CADASTRAR ALUNO PARA O OPERADOR CONECTADO
     if ($metodo === 'POST') {
 
         $dados = json_decode(file_get_contents('php://input'), true);
@@ -107,7 +104,6 @@ try {
         exit;
     }
 
-    // EXCLUIR SOMENTE ALUNO DO OPERADOR CONECTADO
     if ($metodo === 'DELETE') {
 
         $id = (int) ($_GET['id'] ?? 0);

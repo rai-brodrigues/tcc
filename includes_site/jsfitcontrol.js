@@ -1,7 +1,4 @@
 
-/* =========================================
-   FITCONTROL - CONFIGURAÇÕES
-========================================= */
 
 const API_ALUNOS = '/tcc/painel/alunos_api.php';
 const API_TREINOS = '/tcc/painel/treinos_api.php';
@@ -14,9 +11,7 @@ let avaliacoes = [];
 let instrutores = [];
 
 
-/* =========================================
-   FUNÇÕES AUXILIARES
-========================================= */
+
 
 function esc(valor) {
     return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
@@ -41,9 +36,7 @@ function atualizarDashboard() {
 }
 
 
-/* =========================================
-   CARREGAR ALUNOS E DEMAIS DADOS
-========================================= */
+
 
 async function carregarAlunos() {
     try {
@@ -81,9 +74,7 @@ async function carregarAlunos() {
 }
 
 
-/* =========================================
-   DASHBOARD
-========================================= */
+
 
 function renderDashboard() {
     const total = document.getElementById('total');
@@ -111,9 +102,7 @@ function renderDashboard() {
 }
 
 
-/* =========================================
-   ALUNOS - MYSQL
-========================================= */
+
 
 function renderAlunos() {
     const tabela = document.getElementById('listaAlunos');
@@ -183,9 +172,7 @@ function preencherAlunos(idSelect) {
 }
 
 
-/* =========================================
-   CADASTRAR ALUNO
-========================================= */
+
 
 async function addAluno(event) {
     event.preventDefault();
@@ -237,9 +224,7 @@ async function addAluno(event) {
 }
 
 
-/* =========================================
-   EXCLUIR ALUNO
-========================================= */
+
 
 async function excluirAluno(id) {
     if (!confirm('Deseja realmente excluir este aluno?')) {
@@ -271,9 +256,7 @@ async function excluirAluno(id) {
 }
 
 
-/* =========================================
-   TREINOS - MYSQL
-========================================= */
+
 
 async function carregarTreinos() {
     const resposta = await fetch(API_TREINOS);
@@ -398,9 +381,7 @@ async function excluirTreino(id) {
 }
 
 
-/* =========================================
-   AVALIAÇÕES FÍSICAS - MYSQL
-========================================= */
+
 
 async function carregarAvaliacoes() {
     try {
@@ -537,9 +518,7 @@ async function excluirAvaliacao(id) {
 }
 
 
-/* =========================================
-   INSTRUTORES - MYSQL
-========================================= */
+
 
 async function carregarInstrutores() {
     try {
@@ -662,9 +641,7 @@ async function excluirInstrutor(id) {
 }
 
 
-/* =========================================
-   RELATÓRIOS
-========================================= */
+
 
 function renderRelatorios() {
     const totalAlunos = document.getElementById('relTotalAlunos');
@@ -751,9 +728,7 @@ function renderRelatorios() {
 }
 
 
-/* =========================================
-   INICIALIZAÇÃO
-========================================= */
+
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('FitControl iniciado.');

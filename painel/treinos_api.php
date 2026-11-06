@@ -19,7 +19,6 @@ require_once __DIR__ . '/conexao.php';
 try {
     $metodo = $_SERVER['REQUEST_METHOD'];
 
-    // LISTAR TREINOS DO OPERADOR
     if ($metodo === 'GET') {
         $sql = "
             SELECT
@@ -51,7 +50,6 @@ try {
         exit;
     }
 
-    // CADASTRAR TREINO
     if ($metodo === 'POST') {
         $dados = json_decode(file_get_contents('php://input'), true);
 
@@ -82,7 +80,6 @@ try {
             exit;
         }
 
-        // CONFIRMAR QUE O ALUNO PERTENCE AO OPERADOR
         $verificar = $conexao->prepare(
             "SELECT id FROM alunos WHERE id = ? AND id_operador = ?"
         );
@@ -96,7 +93,6 @@ try {
             exit;
         }
 
-        // INSERIR TREINO COM O OPERADOR DA SESSÃO
         $sql = "
             INSERT INTO treinos
             (aluno_id, grupo, exercicio, series, repeticoes, carga, id_operador)
@@ -126,7 +122,6 @@ try {
         exit;
     }
 
-    // EXCLUIR TREINO DO OPERADOR
     if ($metodo === 'DELETE') {
         $id = (int) ($_GET['id'] ?? 0);
 

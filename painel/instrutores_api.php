@@ -19,7 +19,6 @@ require_once __DIR__ . '/conexao.php';
 try {
     $metodo = $_SERVER['REQUEST_METHOD'];
 
-    // LISTAR INSTRUTORES DO OPERADOR
     if ($metodo === 'GET') {
         $sql = "
             SELECT
@@ -47,7 +46,6 @@ try {
         exit;
     }
 
-    // CADASTRAR INSTRUTOR
     if ($metodo === 'POST') {
         $dados = json_decode(file_get_contents('php://input'), true);
 
@@ -84,7 +82,6 @@ try {
         exit;
     }
 
-    // EXCLUIR INSTRUTOR DO OPERADOR
     if ($metodo === 'DELETE') {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
