@@ -1,9 +1,9 @@
+const BASE_URL = window.location.pathname.startsWith('/tcc/') ? '/tcc' : '';
 
-
-const API_ALUNOS = '/tcc/painel/alunos_api.php';
-const API_TREINOS = '/tcc/painel/treinos_api.php';
-const API_AVALIACOES = '/tcc/painel/avaliacoes_api.php';
-const API_INSTRUTORES = '/tcc/painel/instrutores_api.php';
+const API_ALUNOS = `${BASE_URL}/painel/alunos_api.php`;
+const API_TREINOS = `${BASE_URL}/painel/treinos_api.php`;
+const API_AVALIACOES = `${BASE_URL}/painel/avaliacoes_api.php`;
+const API_INSTRUTORES = `${BASE_URL}/painel/instrutores_api.php`;
 
 let alunos = [];
 let treinos = [];

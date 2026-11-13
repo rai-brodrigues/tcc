@@ -1,5 +1,13 @@
 <?php
-require_once __DIR__ . '/painel/verifica_login.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$logado = !empty($_SESSION['usuario_id']);
+
+$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
+    ? '/tcc'
+    : '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -9,6 +17,7 @@ require_once __DIR__ . '/painel/verifica_login.php';
     <title>Instrutores | Gestão de Monitoramento</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/css/estilo-global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -106,6 +115,8 @@ require_once __DIR__ . '/painel/verifica_login.php';
     <h2>Gestão de instrutores</h2>
     <p class="text-muted">Cadastre e organize os profissionais da academia.</p>
 
+    <?php if ($logado): ?>
+
     <div class="card p-4 mt-4 shadow-sm">
 
         <h5>Cadastrar instrutor</h5>
@@ -161,12 +172,35 @@ require_once __DIR__ . '/painel/verifica_login.php';
 
     </div>
 
+    <?php else: ?>
+
+    <div class="card p-4 mt-4 shadow-sm text-center">
+
+        <h5>Acesso à gestão de instrutores</h5>
+
+        <p class="text-muted mb-3">
+            Faça login no FitControl para cadastrar,
+            consultar e organizar os instrutores da sua academia.
+        </p>
+
+        <div>
+            <a href="<?= $base ?>/login/" class="btn btn-danger">
+                Fazer Login
+            </a>
+        </div>
+
+    </div>
+
+<?php endif; ?>
+
 </main>
 
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/tcc/includes_site/jsfitcontrol.js?v=2"></script>
+<?php if ($logado): ?>
+    <script src="<?= $base ?>/includes_site/jsfitcontrol.js?v=6"></script>
+<?php endif; ?>
 
 </body>
 </html>

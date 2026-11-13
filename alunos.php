@@ -1,6 +1,13 @@
-
 <?php
-require_once __DIR__ . '/painel/verifica_login.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$logado = !empty($_SESSION['usuario_id']);
+
+$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
+    ? '/tcc'
+    : '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -10,6 +17,7 @@ require_once __DIR__ . '/painel/verifica_login.php';
     <title>Alunos | Gestão de Monitoramento</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/css/estilo-global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
      <style>
@@ -110,6 +118,8 @@ require_once __DIR__ . '/painel/verifica_login.php';
         Cadastre e acompanhe os alunos da academia.
     </p>
 
+    <?php if ($logado): ?>
+
     <div class="card p-4 mt-4 shadow-sm">
 
         <h5>Novo aluno</h5>
@@ -195,6 +205,26 @@ require_once __DIR__ . '/painel/verifica_login.php';
         </div>
 
     </div>
+<?php else: ?>
+
+    <div class="card p-4 mt-4 shadow-sm text-center">
+
+        <h5>Acesso à gestão de alunos</h5>
+
+        <p class="text-muted mb-3">
+            Faça login no FitControl para cadastrar, pesquisar
+            e acompanhar os alunos da sua academia.
+        </p>
+
+        <div>
+            <a href="<?= $base ?>/login/" class="btn btn-danger">
+                Fazer Login
+            </a>
+        </div>
+
+    </div>
+
+<?php endif; ?>
 
 </main>
 
@@ -202,7 +232,9 @@ require_once __DIR__ . '/painel/verifica_login.php';
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="http://localhost/tcc/includes_site/jsfitcontrol.js"></script>
+<?php if ($logado): ?>
+    <script src="<?= $base ?>/includes_site/jsfitcontrol.js?v=6"></script>
+<?php endif; ?>
 
 <script>
     console.log("Teste: JavaScript da página carregado!");

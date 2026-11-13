@@ -9,7 +9,8 @@ $logado = !empty($_SESSION['usuario_id']);
 
 ?>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+<nav class="navbar navbar-expand-lg navbar-dark"
+     style="background: linear-gradient(135deg, #8b0000, #c1121f);">
 
     <div class="container">
 
@@ -33,80 +34,58 @@ $logado = !empty($_SESSION['usuario_id']);
 
             <ul class="navbar-nav me-auto">
 
-                <?php if ($logado): ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.php">Painel</a>
+                </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">
-                            Painel
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="alunos.php">Alunos</a>
+                </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="alunos.php">
-                            Alunos
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="treinos.php">Treinos</a>
+                </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="treinos.php">
-                            Treinos
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="avaliacoes.php">Avaliações</a>
+                </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="avaliacoes.php">
-                            Avaliações
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="instrutores.php">Instrutores</a>
+                </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="instrutores.php">
-                            Instrutores
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="relatorios.php">
-                            Relatórios
-                        </a>
-                    </li>
-
-                <?php endif; ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="relatorios.php">Relatórios</a>
+                </li>
 
             </ul>
 
             <div class="d-flex align-items-center me-3 gap-2">
 
-                <a
-                    href="https://www.instagram.com/colegioceedo/?next=%2F"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-white"
-                    aria-label="Instagram"
-                    title="Instagram"
-                >
+                <a href="https://www.instagram.com/colegioceedo/?next=%2F"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="text-white"
+                   aria-label="Instagram"
+                   title="Instagram">
                     <i class="fa-brands fa-instagram fs-5"></i>
                 </a>
 
-                <a
-                    href="https://wa.me/5551999999999"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-white"
-                    aria-label="WhatsApp"
-                    title="WhatsApp"
-                >
+                <a href="https://wa.me/55992290181"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="text-white"
+                   aria-label="WhatsApp"
+                   title="WhatsApp">
                     <i class="fa-brands fa-whatsapp fs-5"></i>
                 </a>
 
-                <a
-                    href="https://mail.google.com/mail/u/0/#inbox?compose=CllgCHrdlQsLbGCPjSXgnWvDrkDssVPbTbKsrSJvzMvwpVqjFcnRgwCldrNtkKQCbbJGCXnSZHL"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-white"
-                    aria-label="E-mail"
-                    title="E-mail"
-                >
+                <a href="https://mail.google.com/mail/u/0/#inbox?compose=CllgCHrdlQsLbGCPjSXgnWvDrkDssVPbTbKsrSJvzMvwpVqjFcnRgwCldrNtkKQCbbJGCXnSZHL"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="text-white"
+                   aria-label="E-mail"
+                   title="E-mail">
                     <i class="fa-solid fa-envelope fs-5"></i>
                 </a>
 
@@ -129,6 +108,10 @@ $logado = !empty($_SESSION['usuario_id']);
 
             <?php else: ?>
 
+                <span class="text-white me-3 small">
+                    Modo de visualização
+                </span>
+
                 <a href="login/" class="btn btn-dark">
                     Fazer Login
                 </a>
@@ -140,3 +123,14 @@ $logado = !empty($_SESSION['usuario_id']);
     </div>
 
 </nav>
+
+<?php if (!$logado): ?>
+    <div class="text-center py-2"
+         style="background:#242424; color:#fff; font-size:13px; border-bottom:2px solid #c1121f;">
+
+        <i class="fa-solid fa-lock me-1" style="color:#ff4d5a;"></i>
+
+        Para cadastrar, editar ou salvar informações, faça login no FitControl.
+
+    </div>
+<?php endif; ?>

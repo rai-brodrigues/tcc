@@ -19,4 +19,3 @@ $stmt->bind_param('sss', $nome, $email, $senha_hash);
 $stmt->execute();
 
 echo 'Usuário criado com sucesso!';
-```

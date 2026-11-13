@@ -1,173 +1,296 @@
+
 <footer class="footer-academia">
     <div class="footer-content">
 
-        <div class="footer-brand">
-            <div class="footer-icon">
+        <!-- IDENTIDADE -->
+        <div class="footer-column footer-brand">
+            <div class="footer-logo">
                 <i class="fas fa-dumbbell"></i>
+                <span>FitControl</span>
             </div>
 
-            <div>
-                <h5>Gestão de Monitoramento</h5>
-                <p>Sistema de gerenciamento para academia</p>
-            </div>
-        </div>
-
-        <div class="footer-info">
-            <span>
-                <i class="fas fa-shield-alt"></i>
-                Sistema seguro
-            </span>
-
-            <span>
-                <i class="fas fa-chart-line"></i>
-                Monitoramento em tempo real
-            </span>
-
-            <span>
-                <i class="fas fa-calendar-check"></i>
-                Gestão simplificada
-            </span>
-        </div>
-
-        <div class="footer-copy">
             <p>
-                &copy; <?php echo date("Y"); ?> Gestão de Monitoramento para Academia
+                Sistema de gestão e monitoramento para academias.
+                Mais organização, praticidade e controle para o seu negócio.
             </p>
-            <small>Todos os direitos reservados.</small>
+
+            <div class="footer-status">
+                <i class="fas fa-shield-alt"></i>
+                Gestão com acesso protegido
+            </div>
         </div>
 
+        <!-- NAVEGAÇÃO -->
+        <div class="footer-column">
+            <h5>Sistema</h5>
+            <ul>
+                <li><a href="dashboard.php">Painel inicial</a></li>
+                <li><a href="alunos.php">Alunos</a></li>
+                <li><a href="treinos.php">Treinos</a></li>
+                <li><a href="avaliacoes.php">Avaliações</a></li>
+                <li><a href="instrutores.php">Instrutores</a></li>
+                <li><a href="relatorios.php">Relatórios</a></li>
+            </ul>
+        </div>
+
+        <!-- FUNCIONALIDADES -->
+        <div class="footer-column">
+            <h5>Funcionalidades</h5>
+            <ul>
+                <li><span>Gestão de alunos</span></li>
+                <li><span>Controle de treinos</span></li>
+                <li><span>Acompanhamento físico</span></li>
+                <li><span>Gestão de instrutores</span></li>
+                <li><span>Relatórios da academia</span></li>
+            </ul>
+        </div>
+
+        <!-- ACESSO -->
+        <div class="footer-column">
+            <h5>Acesso</h5>
+
+            <p>
+                Acesse sua conta para gerenciar os dados
+                e utilizar todos os recursos do FitControl.
+            </p>
+
+            <a href="login/" class="footer-login">
+                <i class="fas fa-sign-in-alt"></i>
+                Entrar no sistema
+            </a>
+        </div>
+
+    </div>
+
+    <!-- PARTE INFERIOR -->
+    <div class="footer-bottom">
+        <p>
+            &copy; <?php echo date("Y"); ?>
+            FitControl - Sistema de Gestão para Academias.
+        </p>
+
+        <span>
+            <i class="fas fa-lock"></i>
+            Todos os direitos reservados.
+        </span>
     </div>
 </footer>
 
 <style>
+/* ESTRUTURA GERAL */
+html, body {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    flex-shrink: 0;
+}
+
+main {
+    flex: 1 0 auto;
+    padding-bottom: 40px;
+}
+
+/* FOOTER */
 .footer-academia {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    flex-shrink: 0;
+    margin-top: auto;
     width: 100%;
     background: linear-gradient(135deg, #8b0000, #c1121f);
     color: #fff;
-    padding: 8px 20px;
-    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.20);
-    z-index: 1000;
+    padding: 55px 25px 0;
     box-sizing: border-box;
+    border-top: 3px solid #6f0000;
+    font-family: Arial, sans-serif;
 }
 
 .footer-content {
     max-width: 1200px;
-    margin: auto;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1.2fr 1.3fr;
+    gap: 45px;
+    padding-bottom: 40px;
+}
 
+/* TÍTULOS */
+.footer-column h5 {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 5px 0 22px;
+    position: relative;
+}
+
+.footer-column h5::after {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 3px;
+    background: #ffd6d6;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* IDENTIDADE */
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-size: 25px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.footer-logo i {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 10px;
+    font-size: 20px;
+}
+
+.footer-brand p,
+.footer-column p {
+    color: #f1dada;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 0 0 18px;
+}
+
+.footer-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    padding: 9px 12px;
+    border-radius: 6px;
+}
+
+.footer-status i {
+    color: #ffd6d6;
+}
+
+/* LINKS */
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column li {
+    margin-bottom: 13px;
+    font-size: 13px;
+    color: #f1dada;
+}
+
+.footer-column li a,
+.footer-column li span {
+    color: #f1dada;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.footer-column li a:hover {
+    color: #fff;
+    padding-left: 5px;
+}
+
+/* BOTÃO DE LOGIN */
+.footer-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 17px;
+    background: #fff;
+    color: #a0000a;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.footer-login:hover {
+    background: #ffe5e5;
+    color: #8b0000;
+    transform: translateY(-2px);
+}
+
+/* PARTE INFERIOR */
+.footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 65px;
+    border-top: 1px solid rgba(255,255,255,0.22);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
+    flex-wrap: wrap;
 }
 
-.footer-brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.footer-icon {
-    width: 32px;
-    height: 32px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 8px;
-
-    font-size: 15px;
-    color: #fff;
-    flex-shrink: 0;
-}
-
-.footer-brand h5 {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 700;
-    color: #fff;
-}
-
-.footer-brand p {
-    margin: 1px 0 0;
-    font-size: 10px;
-    color: #fff;
-}
-
-.footer-info {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
+.footer-bottom p,
+.footer-bottom span {
+    color: #f1dada;
     font-size: 11px;
-    color: #fff;
+    margin: 0;
 }
 
-.footer-info span {
+.footer-bottom span {
     display: flex;
     align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-    color: #fff;
+    gap: 7px;
 }
 
-.footer-info i {
-    color: #fff;
+.footer-bottom i {
+    color: #ffd6d6;
 }
 
-.footer-copy {
-    text-align: right;
-    color: #fff;
-}
-
-.footer-copy p {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 600;
-    color: #fff;
-}
-
-.footer-copy small {
-    color: #fff;
-    font-size: 9px;
-}
-
-body {
-    padding-bottom: 55px;
-}
-
+/* TABLETS */
 @media (max-width: 900px) {
     .footer-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 6px;
-    }
-
-    .footer-brand {
-        justify-content: center;
-    }
-
-    .footer-info {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .footer-copy {
-        text-align: center;
-    }
-
-    .footer-academia {
-        position: relative;
-    }
-
-    body {
-        padding-bottom: 0;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 35px;
     }
 }
 
+/* CELULARES */
+@media (max-width: 550px) {
+    .footer-academia {
+        padding: 40px 22px 0;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding-bottom: 30px;
+    }
+
+    .footer-logo {
+        font-size: 23px;
+    }
+
+    .footer-bottom {
+        justify-content: center;
+        text-align: center;
+        padding: 18px 0;
+        flex-direction: column;
+    }
+}
 </style>
