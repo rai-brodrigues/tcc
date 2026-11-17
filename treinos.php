@@ -1,13 +1,9 @@
+
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/painel/verifica_login.php';
 
-$logado = !empty($_SESSION['usuario_id']);
-
-$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
-    ? '/tcc'
-    : '';
+$perfil = $_SESSION['perfil'] ?? '';
+$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -17,7 +13,7 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
     <title>Treinos | Gestão de Monitoramento</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/css/estilo-global.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>/css/estilo-global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
@@ -113,9 +109,9 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 <main class="container mt-4 mb-5">
 
     <h2>Fichas de treino</h2>
-    <p class="text-muted">Organize os exercícios de cada aluno.</p>
+    <p class="text-muted">Organize e acompanhe os exercícios dos alunos.</p>
 
-    <?php if ($logado): ?>
+    <?php if (in_array($perfil, ['admin', 'instrutor'], true)): ?>
 
     <div class="card p-4 mt-4 shadow-sm">
 
@@ -134,16 +130,15 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 
                 <div class="col-md-6">
                     <label class="form-label">Grupo muscular</label>
-
-                    <select id="grupo" class="form-select">
-                        <option>Peito</option>
-                        <option>Costas</option>
-                        <option>Pernas</option>
-                        <option>Ombros</option>
-                        <option>Bíceps</option>
-                        <option>Tríceps</option>
-                        <option>Abdômen</option>
-                        <option>Cardio</option>
+                    <select id="grupo" class="form-select" required>
+                        <option value="Peito">Peito</option>
+                        <option value="Costas">Costas</option>
+                        <option value="Pernas">Pernas</option>
+                        <option value="Ombros">Ombros</option>
+                        <option value="Bíceps">Bíceps</option>
+                        <option value="Tríceps">Tríceps</option>
+                        <option value="Abdômen">Abdômen</option>
+                        <option value="Cardio">Cardio</option>
                     </select>
                 </div>
 
@@ -177,6 +172,16 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 
     </div>
 
+    <?php elseif ($perfil === 'aluno'): ?>
+
+    <div class="card p-3 mt-4 shadow-sm">
+        <p class="mb-0">Aqui você pode consultar suas próprias fichas de treino.</p>
+    </div>
+
+    <?php endif; ?>
+
+    <?php if (in_array($perfil, ['admin', 'instrutor', 'aluno'], true)): ?>
+
     <div class="card p-4 mt-4 shadow-sm">
 
         <h5>Treinos registrados</h5>
@@ -193,7 +198,9 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
                         <th>Séries</th>
                         <th>Repetições</th>
                         <th>Carga</th>
-                        <th>Ações</th>
+                        <?php if ($perfil === 'admin'): ?>
+                            <th>Ações</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
 
@@ -205,35 +212,29 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 
     </div>
 
-    <?php else: ?>
+    <?php endif; ?>
 
-    <div class="card p-4 mt-4 shadow-sm text-center">
-
-        <h5>Acesso à gestão de treinos</h5>
-
-        <p class="text-muted mb-3">
-            Faça login no FitControl para criar fichas,
-            consultar e acompanhar os treinos dos alunos.
-        </p>
-
-        <div>
-            <a href="<?= $base ?>/login/" class="btn btn-danger">
-                Fazer Login
-            </a>
+    <?php if (!in_array($perfil, ['admin', 'instrutor', 'aluno'], true)): ?>
+        <div class="card p-4 mt-4">
+            <h5>Acesso não permitido</h5>
         </div>
-
-    </div>
-
-<?php endif; ?>
+    <?php endif; ?>
 
 </main>
 
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<?php if ($logado): ?>
-    <script src="<?= $base ?>/includes_site/jsfitcontrol.js?v=6"></script>
-<?php endif; ?>
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
+<script>
+    window.PERFIL_USUARIO = <?= json_encode($_SESSION['perfil'] ?? '') ?>;
+</script>
+<script src="<?php echo $base; ?>/includes_site/jsfitcontrol.js?v=7"></script>
 
 </body>
 </html>

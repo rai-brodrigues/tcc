@@ -1,13 +1,8 @@
+
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/painel/verifica_login.php';
 
-$logado = !empty($_SESSION['usuario_id']);
-
-$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
-    ? '/tcc'
-    : '';
+$perfil = $_SESSION['perfil'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -115,7 +110,7 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
     <h2>Gestão de instrutores</h2>
     <p class="text-muted">Cadastre e organize os profissionais da academia.</p>
 
-    <?php if ($logado): ?>
+    <?php if ($perfil === 'admin'): ?>
 
     <div class="card p-4 mt-4 shadow-sm">
 
@@ -148,9 +143,28 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 
     </div>
 
+    <?php elseif ($perfil === 'instrutor'): ?>
+
+    <div class="card p-3 mt-4">
+        <p class="mb-0">Aqui você pode visualizar seus dados profissionais.</p>
+    </div>
+
+    <?php elseif ($perfil === 'aluno'): ?>
+
+<div class="card p-3 mt-4">
+    <h5>Seu instrutor responsável</h5>
+    <p class="mb-0">Aqui você pode visualizar os dados do instrutor responsável pelo seu acompanhamento.</p>
+</div>
+
+    <?php endif; ?>
+
+    <?php if (in_array($perfil, ['admin', 'instrutor', 'aluno'], true)): ?>
+
     <div class="card p-4 mt-4 shadow-sm">
 
-        <h5>Equipe cadastrada</h5>
+        <h5>
+    <?= $perfil === 'aluno' ? 'Meu instrutor' : 'Equipe cadastrada' ?>
+</h5>
 
         <div class="table-responsive">
 
@@ -160,7 +174,9 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
                     <tr>
                         <th>Nome</th>
                         <th>Especialidade</th>
-                        <th>Ações</th>
+                        <?php if ($perfil === 'admin'): ?>
+                            <th>Ações</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
 
@@ -172,35 +188,14 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 
     </div>
 
-    <?php else: ?>
-
-    <div class="card p-4 mt-4 shadow-sm text-center">
-
-        <h5>Acesso à gestão de instrutores</h5>
-
-        <p class="text-muted mb-3">
-            Faça login no FitControl para cadastrar,
-            consultar e organizar os instrutores da sua academia.
-        </p>
-
-        <div>
-            <a href="<?= $base ?>/login/" class="btn btn-danger">
-                Fazer Login
-            </a>
-        </div>
-
-    </div>
-
-<?php endif; ?>
+    <?php endif; ?>
 
 </main>
 
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<?php if ($logado): ?>
-    <script src="<?= $base ?>/includes_site/jsfitcontrol.js?v=6"></script>
-<?php endif; ?>
+<script src="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/includes_site/jsfitcontrol.js?v=6"></script>
 
 </body>
 </html>

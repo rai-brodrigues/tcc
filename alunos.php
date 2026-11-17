@@ -1,13 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/painel/verifica_login.php';
 
-$logado = !empty($_SESSION['usuario_id']);
-
-$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
-    ? '/tcc'
-    : '';
+$perfil = $_SESSION['perfil'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -20,7 +14,7 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
     <link rel="stylesheet" href="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/css/estilo-global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-     <style>
+    <style>
         body {
             background-color: #111 !important;
             color: #fff;
@@ -112,13 +106,19 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 
 <main class="container mt-4 mb-5">
 
-    <h2>Gestão de alunos</h2>
+    <h2>
+        <?php echo $perfil === 'aluno' ? 'Meu cadastro' : 'Gestão de alunos'; ?>
+    </h2>
 
     <p class="text-muted">
-        Cadastre e acompanhe os alunos da academia.
+        <?php if ($perfil === 'aluno'): ?>
+            Consulte seus dados cadastrais na academia.
+        <?php else: ?>
+            Cadastre e acompanhe os alunos da academia.
+        <?php endif; ?>
     </p>
 
-    <?php if ($logado): ?>
+    <?php if ($perfil === 'admin'): ?>
 
     <div class="card p-4 mt-4 shadow-sm">
 
@@ -139,8 +139,20 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
                 </div>
 
                 <div class="col-md-6 mt-2">
-                    <label class="form-label">E-mail</label>
-                    <input type="email" id="email" class="form-control">
+                    <label class="form-label">E-mail (login)</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+
+                <div class="col-md-6 mt-2">
+                    <label class="form-label">Senha de acesso</label>
+                    <input
+                        type="password"
+                        id="senha"
+                        class="form-control"
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="Mínimo de 8 caracteres"
+                        required>
                 </div>
 
                 <div class="col-md-6 mt-2">
@@ -160,6 +172,14 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
                     </select>
                 </div>
 
+                <div class="col-md-6 mt-2">
+                    <label class="form-label">Instrutor responsável</label>
+
+                    <select id="id_instrutor" class="form-select">
+                        <option value="">Sem instrutor</option>
+                    </select>
+                </div>
+
             </div>
 
             <button type="submit" class="btn btn-danger mt-3">
@@ -170,9 +190,41 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 
     </div>
 
+    <?php elseif ($perfil === 'instrutor'): ?>
+
+    <div class="card p-3 mt-4 shadow-sm">
+        <p class="mb-0">
+            Aqui estão os alunos vinculados ao seu perfil de instrutor.
+        </p>
+    </div>
+
+    <?php elseif ($perfil === 'aluno'): ?>
+
+    <div class="card p-3 mt-4 shadow-sm">
+        <p class="mb-0">
+            Aqui você pode consultar seus próprios dados cadastrais.
+            Seus dados são privados e não ficam disponíveis para outros alunos.
+        </p>
+    </div>
+
+    <?php else: ?>
+
+    <div class="card p-4 mt-4 shadow-sm text-center">
+        <h5>Acesso não permitido</h5>
+        <p class="text-muted mb-0">
+            Esta página é destinada à gestão de alunos da academia.
+        </p>
+    </div>
+
+    <?php endif; ?>
+
+    <?php if (in_array($perfil, ['admin', 'instrutor', 'aluno'], true)): ?>
+
     <div class="card p-4 mt-4 shadow-sm">
 
-        <h5>Alunos cadastrados</h5>
+        <h5>
+            <?php echo $perfil === 'aluno' ? 'Meus dados cadastrais' : 'Alunos cadastrados'; ?>
+        </h5>
 
         <input
             type="text"
@@ -194,7 +246,10 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
                         <th>Telefone</th>
                         <th>Plano</th>
                         <th>Status</th>
-                        <th>Ações</th>
+
+                        <?php if ($perfil === 'admin'): ?>
+                            <th>Ações</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
 
@@ -205,39 +260,109 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
         </div>
 
     </div>
-<?php else: ?>
 
-    <div class="card p-4 mt-4 shadow-sm text-center">
+    <?php endif; ?>
 
-        <h5>Acesso à gestão de alunos</h5>
+</main>
 
-        <p class="text-muted mb-3">
-            Faça login no FitControl para cadastrar, pesquisar
-            e acompanhar os alunos da sua academia.
-        </p>
 
-        <div>
-            <a href="<?= $base ?>/login/" class="btn btn-danger">
-                Fazer Login
-            </a>
+<?php if ($perfil === 'admin'): ?>
+
+<div class="modal fade" id="modalEditarAluno" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Editar aluno</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <form id="formEditarAluno">
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="editarId">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nome completo</label>
+                            <input type="text" id="editarNome" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Idade</label>
+                            <input type="number" id="editarIdade" class="form-control" min="1" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" id="editarEmail" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" id="editarTelefone" class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Plano</label>
+
+                            <select id="editarPlano" class="form-select" required>
+                                <option value="">Selecione o plano</option>
+                                <option>Mensal -- R$ 80,00</option>
+                                <option>Trimestral -- R$ 180,00</option>
+                                <option>Semestral -- R$ 260,00</option>
+                                <option>Anual -- R$ 340,00</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Instrutor responsável</label>
+
+                            <select id="editarInstrutor" class="form-select">
+                                <option value="">Sem instrutor</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+                        Salvar alterações
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
 
     </div>
 
-<?php endif; ?>
+</div>
 
-</main>
+<?php endif; ?>
 
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<?php if ($logado): ?>
-    <script src="<?= $base ?>/includes_site/jsfitcontrol.js?v=6"></script>
-<?php endif; ?>
+<script src="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/includes_site/jsfitcontrol.js?v=6"></script>
 
 <script>
     console.log("Teste: JavaScript da página carregado!");
+    console.log("Perfil:", window.PERFIL_USUARIO);
     console.log("addAluno:", typeof addAluno);
 </script>
 

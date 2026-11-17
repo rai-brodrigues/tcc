@@ -1,25 +1,29 @@
-
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/verifica_permissao.php';
+require_once __DIR__ . '/conexao.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (empty($_SESSION['usuario_id'])) {
-    http_response_code(401);
-    echo json_encode(['erro' => 'Você precisa fazer login.']);
+$idOperador = obterUsuarioId();
+$idAcademia = obterAcademiaId();
+$perfil = obterPerfil();
+
+function responder($codigo, $dados)
+{
+    http_response_code($codigo);
+    echo json_encode($dados, JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$idOperador = (int) $_SESSION['usuario_id'];
-
-require_once __DIR__ . '/conexao.php';
-
 try {
+    if ($idOperador <= 0 || $idAcademia <= 0) {
+        responder(401, ['erro' => 'Sessão inválida. Faça login novamente.']);
+    }
+
     $metodo = $_SERVER['REQUEST_METHOD'];
 
     if ($metodo === 'GET') {
+
         $sql = "
             SELECT
                 av.id,
@@ -28,18 +32,37 @@ try {
                 av.peso,
                 av.altura,
                 av.gordura,
-                ROUND(av.peso / (av.altura * av.altura), 2) AS imc,
+                ROUND(av.peso / NULLIF(av.altura * av.altura, 0), 2) AS imc,
                 DATE_FORMAT(av.data_cadastro, '%d/%m/%Y') AS data
             FROM avaliacoes av
             INNER JOIN alunos al
                 ON al.id = av.aluno_id
-                AND al.id_operador = av.id_operador
-            WHERE av.id_operador = ?
-            ORDER BY av.id DESC
+                AND al.id_academia = av.id_academia
+            WHERE av.id_academia = ?
         ";
 
+        if ($perfil === 'instrutor') {
+            $sql .= " AND al.id_instrutor = ?";
+        } elseif ($perfil === 'aluno') {
+            $sql .= " AND av.aluno_id = ?";
+        } elseif ($perfil !== 'admin') {
+            responder(403, ['erro' => 'Perfil sem permissão.']);
+        }
+
+        $sql .= " ORDER BY av.id DESC";
+
         $stmt = $conexao->prepare($sql);
-        $stmt->bind_param('i', $idOperador);
+
+        if ($perfil === 'instrutor') {
+            $instrutorId = obterInstrutorId();
+            $stmt->bind_param('ii', $idAcademia, $instrutorId);
+        } elseif ($perfil === 'aluno') {
+            $alunoId = obterAlunoId();
+            $stmt->bind_param('ii', $idAcademia, $alunoId);
+        } else {
+            $stmt->bind_param('i', $idAcademia);
+        }
+
         $stmt->execute();
 
         $resultado = $stmt->get_result();
@@ -49,17 +72,19 @@ try {
             $avaliacoes[] = $linha;
         }
 
-        echo json_encode($avaliacoes);
-        exit;
+        responder(200, $avaliacoes);
     }
 
     if ($metodo === 'POST') {
+
+        if (!in_array($perfil, ['admin', 'instrutor'], true)) {
+            responder(403, ['erro' => 'Você não tem permissão para cadastrar avaliações.']);
+        }
+
         $dados = json_decode(file_get_contents('php://input'), true);
 
         if (!is_array($dados)) {
-            http_response_code(400);
-            echo json_encode(['erro' => 'Dados inválidos.']);
-            exit;
+            responder(400, ['erro' => 'Dados inválidos.']);
         }
 
         $aluno = (int) ($dados['aluno'] ?? 0);
@@ -72,97 +97,110 @@ try {
             : (float) $gorduraInformada;
 
         if ($aluno <= 0 || $peso <= 0 || $altura <= 0) {
-            http_response_code(400);
-            echo json_encode([
-                'erro' => 'Preencha corretamente os campos obrigatórios.'
-            ]);
-            exit;
+            responder(400, ['erro' => 'Preencha corretamente os campos obrigatórios.']);
         }
 
         if ($gordura !== null && ($gordura < 0 || $gordura > 100)) {
-            http_response_code(400);
-            echo json_encode([
-                'erro' => 'A gordura corporal deve estar entre 0 e 100%.'
-            ]);
-            exit;
+            responder(400, ['erro' => 'A gordura corporal deve estar entre 0 e 100%.']);
         }
 
-        $verificar = $conexao->prepare(
-            "SELECT id FROM alunos WHERE id = ? AND id_operador = ?"
-        );
+        $sqlVerificar = "
+            SELECT id
+            FROM alunos
+            WHERE id = ?
+            AND id_academia = ?
+        ";
 
-        $verificar->bind_param('ii', $aluno, $idOperador);
+        if ($perfil === 'instrutor') {
+            $sqlVerificar .= " AND id_instrutor = ?";
+        }
+
+        $verificar = $conexao->prepare($sqlVerificar);
+
+        if ($perfil === 'instrutor') {
+            $instrutorId = obterInstrutorId();
+            $verificar->bind_param('iii', $aluno, $idAcademia, $instrutorId);
+        } else {
+            $verificar->bind_param('ii', $aluno, $idAcademia);
+        }
+
         $verificar->execute();
 
         if ($verificar->get_result()->num_rows === 0) {
-            http_response_code(400);
-            echo json_encode(['erro' => 'Aluno não encontrado.']);
-            exit;
+            responder(400, ['erro' => 'Aluno não encontrado ou não vinculado a este instrutor.']);
         }
 
         $sql = "
             INSERT INTO avaliacoes
-            (aluno_id, peso, altura, gordura, id_operador)
-            VALUES (?, ?, ?, ?, ?)
+            (aluno_id, peso, altura, gordura, id_operador, id_academia)
+            VALUES (?, ?, ?, ?, ?, ?)
         ";
 
         $stmt = $conexao->prepare($sql);
         $stmt->bind_param(
-            'idddi',
+            'idddii',
             $aluno,
             $peso,
             $altura,
             $gordura,
-            $idOperador
+            $idOperador,
+            $idAcademia
         );
 
         $stmt->execute();
 
-        echo json_encode([
+        responder(201, [
             'sucesso' => true,
             'mensagem' => 'Avaliação cadastrada com sucesso!',
             'id' => $conexao->insert_id
         ]);
-        exit;
+    }
+
+    if ($metodo === 'PUT') {
+        if ($perfil !== 'admin') {
+            responder(403, ['erro' => 'Somente o administrador pode editar avaliações.']);
+        }
+
+        responder(400, ['erro' => 'A edição de avaliações ainda não está implementada.']);
     }
 
     if ($metodo === 'DELETE') {
+
+        if ($perfil !== 'admin') {
+            responder(403, ['erro' => 'Somente o administrador pode excluir avaliações.']);
+        }
+
         $id = (int) ($_GET['id'] ?? 0);
 
         if ($id <= 0) {
-            http_response_code(400);
-            echo json_encode(['erro' => 'ID inválido.']);
-            exit;
+            responder(400, ['erro' => 'ID inválido.']);
         }
 
-        $stmt = $conexao->prepare(
-            "DELETE FROM avaliacoes WHERE id = ? AND id_operador = ?"
-        );
+        $stmt = $conexao->prepare("
+            DELETE FROM avaliacoes
+            WHERE id = ? AND id_academia = ?
+        ");
 
-        $stmt->bind_param('ii', $id, $idOperador);
+        $stmt->bind_param('ii', $id, $idAcademia);
         $stmt->execute();
 
         if ($stmt->affected_rows === 0) {
-            http_response_code(404);
-            echo json_encode(['erro' => 'Avaliação não encontrada.']);
-            exit;
+            responder(404, ['erro' => 'Avaliação não encontrada.']);
         }
 
-        echo json_encode([
+        responder(200, [
             'sucesso' => true,
             'mensagem' => 'Avaliação excluída com sucesso!'
         ]);
-        exit;
     }
 
-    http_response_code(405);
-    echo json_encode(['erro' => 'Método não permitido.']);
+    responder(405, ['erro' => 'Método não permitido.']);
 
 } catch (Throwable $e) {
+
     error_log('Erro na API de avaliações: ' . $e->getMessage());
 
-    http_response_code(500);
-    echo json_encode([
+    responder(500, [
         'erro' => 'Ocorreu um erro ao processar a avaliação.'
     ]);
 }

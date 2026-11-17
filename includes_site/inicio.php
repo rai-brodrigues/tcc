@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -6,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Conheça nossa academia, modalidades de treino, estrutura e benefícios para sua saúde e qualidade de vida.">
+    <meta name="description" content="Conheça a academia e o FitControl, sistema de monitoramento de treinos, avaliações físicas e desempenho dos alunos.">
 
-    <title>Academia | Gestão de Monitoramento</title>
+    <title>Início | Gestão de Monitoramento</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -57,7 +56,6 @@
             font-family: inherit;
         }
 
-       
 
         .carrossel {
             width: 100%;
@@ -100,7 +98,10 @@
             letter-spacing: -1px;
         }
 
-        .titulo h2 span {
+        .titulo h2 span,
+        .sobre-texto h2 span,
+        .secao-titulo h2 span,
+        .chamada h2 span {
             color: var(--vermelho);
         }
 
@@ -256,7 +257,6 @@
             background: var(--vermelho);
         }
 
-      
 
         .sobre {
             width: 100%;
@@ -354,10 +354,6 @@
             margin-bottom: 25px;
         }
 
-        .sobre-texto h2 span {
-            color: var(--vermelho);
-        }
-
         .sobre-texto p {
             color: #bbbbbb;
             font-size: 15px;
@@ -411,7 +407,6 @@
             box-shadow: 0 8px 20px rgba(255,0,0,0.2);
         }
 
-        
 
         .beneficios {
             padding: 100px 25px;
@@ -438,10 +433,6 @@
             font-weight: 900;
             text-transform: uppercase;
             margin-bottom: 15px;
-        }
-
-        .secao-titulo h2 span {
-            color: var(--vermelho);
         }
 
         .secao-titulo p {
@@ -532,7 +523,124 @@
             line-height: 1.8;
         }
 
-        
+
+        .sobre-sistema {
+            padding: 100px 25px;
+            background: var(--preto-secundario);
+            border-top: 1px solid #292929;
+            border-bottom: 1px solid #292929;
+        }
+
+        .sobre-sistema-container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .sobre-sistema-cabecalho {
+            max-width: 850px;
+            margin: 0 auto 50px;
+            text-align: center;
+        }
+
+        .sobre-sistema-cabecalho .subtitulo {
+            display: block;
+            color: var(--vermelho);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .sobre-sistema-cabecalho h2 {
+            font-size: clamp(29px, 4vw, 42px);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .sobre-sistema-cabecalho h2 span {
+            color: var(--vermelho);
+        }
+
+        .sobre-sistema-cabecalho p {
+            color: #bbbbbb;
+            font-size: 15px;
+            line-height: 1.9;
+        }
+
+        .sistema-recursos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .sistema-recurso {
+            background: var(--card);
+            border: 1px solid var(--borda);
+            border-radius: 13px;
+            padding: 30px 25px;
+            transition: var(--transicao);
+        }
+
+        .sistema-recurso:hover {
+            transform: translateY(-7px);
+            border-color: rgba(255, 0, 0, 0.6);
+        }
+
+        .sistema-recurso .icone {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .sistema-recurso .icone i {
+            color: var(--vermelho);
+            font-size: 25px;
+        }
+
+        .sistema-recurso h3 {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .sistema-recurso p {
+            color: #aaaaaa;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .sistema-objetivo {
+            margin-top: 35px;
+            padding: 30px;
+            border-left: 4px solid var(--vermelho);
+            border-radius: 8px;
+            background: #1a1a1a;
+        }
+
+        .sistema-objetivo h3 {
+            font-size: 19px;
+            margin-bottom: 12px;
+        }
+
+        .sistema-objetivo h3 i {
+            color: var(--vermelho);
+            margin-right: 8px;
+        }
+
+        .sistema-objetivo p {
+            color: #bbbbbb;
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
 
         .chamada {
             position: relative;
@@ -569,10 +677,6 @@
             text-transform: uppercase;
             margin-bottom: 22px;
             line-height: 1.2;
-        }
-
-        .chamada h2 span {
-            color: var(--vermelho);
         }
 
         .chamada p {
@@ -624,11 +728,11 @@
         }
 
         .titulo,
-        .secao-titulo {
+        .secao-titulo,
+        .sobre-sistema-cabecalho {
             animation: aparecer 0.7s ease both;
         }
 
-        
 
         @media (max-width: 1000px) {
 
@@ -636,7 +740,8 @@
                 gap: 40px;
             }
 
-            .beneficios-grid {
+            .beneficios-grid,
+            .sistema-recursos {
                 grid-template-columns: repeat(2, 1fr);
             }
 
@@ -747,11 +852,13 @@
                 font-size: 14px;
             }
 
-            .beneficios {
+            .beneficios,
+            .sobre-sistema {
                 padding: 70px 20px;
             }
 
-            .beneficios-grid {
+            .beneficios-grid,
+            .sistema-recursos {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
             }
@@ -764,7 +871,8 @@
                 font-size: 16px;
             }
 
-            .beneficio p {
+            .beneficio p,
+            .sistema-recurso p {
                 font-size: 12px;
             }
 
@@ -777,6 +885,14 @@
                 font-size: 25px;
             }
 
+            .sistema-recurso {
+                padding: 25px 18px;
+            }
+
+            .sistema-objetivo {
+                padding: 22px;
+            }
+
             .chamada {
                 padding: 75px 20px;
             }
@@ -784,7 +900,6 @@
             .chamada p {
                 font-size: 14px;
             }
-
         }
 
         @media (max-width: 480px) {
@@ -833,7 +948,8 @@
                 font-size: 10px;
             }
 
-            .beneficios-grid {
+            .beneficios-grid,
+            .sistema-recursos {
                 grid-template-columns: 1fr;
             }
 
@@ -854,10 +970,7 @@
                 padding: 16px 15px;
                 font-size: 12px;
             }
-
         }
-
-        /
 
         @media (prefers-reduced-motion: reduce) {
 
@@ -868,7 +981,6 @@
                 animation-duration: 0.01ms !important;
                 transition-duration: 0.01ms !important;
             }
-
         }
 
     </style>
@@ -877,7 +989,6 @@
 
 <body>
 
-    
 
     <section class="carrossel" aria-label="Modalidades da academia">
 
@@ -1028,9 +1139,7 @@
     </section>
 
 
-    
-
-    <section class="sobre">
+    <section class="sobre" id="sobre-academia">
 
         <div class="sobre-container">
 
@@ -1111,8 +1220,6 @@
 
     </section>
 
-
-    
 
     <section class="beneficios">
 
@@ -1227,7 +1334,142 @@
     </section>
 
 
-    
+    <section class="sobre-sistema" id="sobre-sistema">
+
+        <div class="sobre-sistema-container">
+
+            <div class="sobre-sistema-cabecalho">
+
+                <span class="subtitulo">Conheça nossa tecnologia</span>
+
+                <h2>
+                    Sobre o <span>FitControl</span>
+                </h2>
+
+                <p>
+                    O FitControl é um sistema de monitoramento de treinos
+                    desenvolvido para auxiliar no gerenciamento de academias
+                    e no acompanhamento do desempenho dos alunos.
+                    A plataforma reúne informações importantes em um único
+                    ambiente, facilitando a organização e o acesso aos dados.
+                </p>
+
+            </div>
+
+            <div class="sistema-recursos">
+
+                <div class="sistema-recurso">
+
+                    <div class="icone">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <h3>Gestão de Alunos</h3>
+
+                    <p>
+                        Permite cadastrar e organizar os alunos, mantendo
+                        suas informações centralizadas e acessíveis.
+                    </p>
+
+                </div>
+
+                <div class="sistema-recurso">
+
+                    <div class="icone">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+
+                    <h3>Fichas de Treinamento</h3>
+
+                    <p>
+                        Possibilita registrar e consultar os treinos
+                        prescritos pelos instrutores para cada aluno.
+                    </p>
+
+                </div>
+
+                <div class="sistema-recurso">
+
+                    <div class="icone">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+
+                    <h3>Acompanhamento de Desempenho</h3>
+
+                    <p>
+                        Registra avaliações físicas e permite acompanhar
+                        a evolução dos alunos ao longo do tempo.
+                    </p>
+
+                </div>
+
+                <div class="sistema-recurso">
+
+                    <div class="icone">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+
+                    <h3>Agenda</h3>
+
+                    <p>
+                        Organiza horários de treinos, avaliações e
+                        atendimentos, facilitando o planejamento.
+                    </p>
+
+                </div>
+
+                <div class="sistema-recurso">
+
+                    <div class="icone">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+
+                    <h3>Relatórios</h3>
+
+                    <p>
+                        Reúne informações para auxiliar na consulta
+                        e no gerenciamento das atividades da academia.
+                    </p>
+
+                </div>
+
+                <div class="sistema-recurso">
+
+                    <div class="icone">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <h3>Acesso por Perfil</h3>
+
+                    <p>
+                        Organiza o acesso de administradores, instrutores
+                        e alunos conforme suas permissões no sistema.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="sistema-objetivo">
+
+                <h3>
+                    <i class="fa-solid fa-bullseye"></i>
+                    Objetivo do Sistema
+                </h3>
+
+                <p>
+                    O principal objetivo do FitControl é facilitar a gestão
+                    das academias e melhorar o acompanhamento da evolução
+                    e do desempenho dos alunos, proporcionando mais
+                    organização, praticidade e controle das informações.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
 
     <section class="chamada" id="contato">
 
@@ -1261,7 +1503,6 @@
         </div>
 
     </section>
-
 
 
     <script>

@@ -1,13 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-$logado = !empty($_SESSION['usuario_id']);
-
-$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
-    ? '/tcc'
-    : '';
+require_once __DIR__ . '/painel/verifica_login.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -124,36 +116,28 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
         <div class="col-md-3">
             <div class="card p-3 shadow-sm">
                 <small>Alunos cadastrados</small>
-                <h2 class="text-danger" id="total">
-                    <?= $logado ? '0' : '—' ?>
-                </h2>
+                <h2 class="text-danger" id="total">0</h2>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card p-3 shadow-sm">
                 <small>Treinos cadastrados</small>
-                <h2 class="text-danger" id="totalTreinos">
-                    <?= $logado ? '0' : '—' ?>
-                </h2>
+                <h2 class="text-danger" id="totalTreinos">0</h2>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card p-3 shadow-sm">
                 <small>Instrutores</small>
-                <h2 class="text-danger" id="totalInstrutores">
-                    <?= $logado ? '0' : '—' ?>
-                </h2>
+                <h2 class="text-danger" id="totalInstrutores">0</h2>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="card p-3 shadow-sm">
                 <small>Avaliações físicas</small>
-                <h2 class="text-danger" id="totalAvaliacoes">
-                    <?= $logado ? '0' : '—' ?>
-                </h2>
+                <h2 class="text-danger" id="totalAvaliacoes">0</h2>
             </div>
         </div>
 
@@ -183,8 +167,9 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<?php if ($logado): ?>
-    <script src="<?= $base ?>/includes_site/jsfitcontrol.js?v=6"></script>
-<?php endif; ?>
-</body>
+<script>
+    window.PERFIL_USUARIO = <?= json_encode($_SESSION['perfil'] ?? '') ?>;
+</script>
+
+<script src="/tcc/includes_site/jsfitcontrol.js?v=6"></script></body>
 </html>

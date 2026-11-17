@@ -1,122 +1,191 @@
 
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+
+require_once __DIR__ . '/verifica_permissao.php';
+require_once __DIR__ . '/conexao.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (empty($_SESSION['usuario_id'])) {
-    http_response_code(401);
-    echo json_encode(['erro' => 'Você precisa fazer login.']);
+$idOperador = obterUsuarioId();
+$idAcademia = obterAcademiaId();
+$perfil = obterPerfil();
+
+function responder($codigo, $dados)
+{
+    http_response_code($codigo);
+    echo json_encode($dados, JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$idOperador = (int) $_SESSION['usuario_id'];
-
-require_once __DIR__ . '/conexao.php';
-
 try {
+
+    if ($idOperador <= 0 || $idAcademia <= 0) {
+        responder(401, ['erro' => 'Sessão inválida. Faça login novamente.']);
+    }
+
     $metodo = $_SERVER['REQUEST_METHOD'];
 
     if ($metodo === 'GET') {
-        $sql = "
-            SELECT
-                id,
-                nome,
-                especialidade,
-                DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data
-            FROM instrutores
-            WHERE id_operador = ?
-            ORDER BY id DESC
-        ";
 
-        $stmt = $conexao->prepare($sql);
-        $stmt->bind_param('i', $idOperador);
+        if ($perfil === 'admin') {
+
+            $sql = "
+                SELECT
+                    id,
+                    nome,
+                    especialidade,
+                    DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data
+                FROM instrutores
+                WHERE id_academia = ?
+                ORDER BY id DESC
+            ";
+
+            $stmt = $conexao->prepare($sql);
+            $stmt->bind_param('i', $idAcademia);
+
+        } elseif ($perfil === 'instrutor') {
+
+            $idInstrutor = obterInstrutorId();
+
+            if ($idInstrutor <= 0) {
+                responder(403, ['erro' => 'Conta de instrutor sem vínculo válido.']);
+            }
+
+            $sql = "
+                SELECT
+                    id,
+                    nome,
+                    especialidade,
+                    DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data
+                FROM instrutores
+                WHERE id = ? AND id_academia = ?
+            ";
+
+            $stmt = $conexao->prepare($sql);
+            $stmt->bind_param('ii', $idInstrutor, $idAcademia);
+
+        } elseif ($perfil === 'aluno') {
+
+            $idAluno = obterAlunoId();
+
+            if ($idAluno <= 0) {
+                responder(403, ['erro' => 'Conta de aluno sem vínculo válido.']);
+            }
+
+            $sql = "
+                SELECT
+                    i.id,
+                    i.nome,
+                    i.especialidade,
+                    DATE_FORMAT(i.data_cadastro, '%d/%m/%Y') AS data
+                FROM alunos a
+                INNER JOIN instrutores i
+                    ON i.id = a.id_instrutor
+                    AND i.id_academia = a.id_academia
+                WHERE a.id = ?
+                    AND a.id_academia = ?
+            ";
+
+            $stmt = $conexao->prepare($sql);
+            $stmt->bind_param('ii', $idAluno, $idAcademia);
+
+        } else {
+            responder(403, ['erro' => 'Você não tem permissão para visualizar instrutores.']);
+        }
+
         $stmt->execute();
-
         $resultado = $stmt->get_result();
+
         $instrutores = [];
 
         while ($linha = $resultado->fetch_assoc()) {
             $instrutores[] = $linha;
         }
 
-        echo json_encode($instrutores, JSON_UNESCAPED_UNICODE);
-        exit;
+        responder(200, $instrutores);
     }
 
     if ($metodo === 'POST') {
+
+        if ($perfil !== 'admin') {
+            responder(403, ['erro' => 'Somente o administrador pode cadastrar instrutores.']);
+        }
+
         $dados = json_decode(file_get_contents('php://input'), true);
 
         if (!is_array($dados)) {
-            http_response_code(400);
-            echo json_encode(['erro' => 'Dados inválidos.']);
-            exit;
+            responder(400, ['erro' => 'Dados inválidos.']);
         }
 
         $nome = trim($dados['nome'] ?? '');
         $especialidade = trim($dados['especialidade'] ?? '');
 
         if ($nome === '') {
-            http_response_code(400);
-            echo json_encode(['erro' => 'Informe o nome do instrutor.']);
-            exit;
+            responder(400, ['erro' => 'Informe o nome do instrutor.']);
         }
 
         $sql = "
             INSERT INTO instrutores
-            (nome, especialidade, id_operador)
-            VALUES (?, NULLIF(?, ''), ?)
+            (nome, especialidade, id_operador, id_academia)
+            VALUES (?, NULLIF(?, ''), ?, ?)
         ";
 
         $stmt = $conexao->prepare($sql);
-        $stmt->bind_param('ssi', $nome, $especialidade, $idOperador);
+
+        $stmt->bind_param(
+            'ssii',
+            $nome,
+            $especialidade,
+            $idOperador,
+            $idAcademia
+        );
+
         $stmt->execute();
 
-        echo json_encode([
+        responder(201, [
             'sucesso' => true,
             'mensagem' => 'Instrutor cadastrado com sucesso!',
             'id' => $conexao->insert_id
-        ], JSON_UNESCAPED_UNICODE);
-        exit;
+        ]);
     }
 
     if ($metodo === 'DELETE') {
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-        if (!$id || $id <= 0) {
-            http_response_code(400);
-            echo json_encode(['erro' => 'ID do instrutor inválido.']);
-            exit;
+        if ($perfil !== 'admin') {
+            responder(403, ['erro' => 'Somente o administrador pode excluir instrutores.']);
         }
 
-        $stmt = $conexao->prepare(
-            "DELETE FROM instrutores WHERE id = ? AND id_operador = ?"
-        );
+        $id = (int) ($_GET['id'] ?? 0);
 
-        $stmt->bind_param('ii', $id, $idOperador);
+        if ($id <= 0) {
+            responder(400, ['erro' => 'ID do instrutor inválido.']);
+        }
+
+        $stmt = $conexao->prepare("
+            DELETE FROM instrutores
+            WHERE id = ? AND id_academia = ?
+        ");
+
+        $stmt->bind_param('ii', $id, $idAcademia);
         $stmt->execute();
 
         if ($stmt->affected_rows === 0) {
-            http_response_code(404);
-            echo json_encode(['erro' => 'Instrutor não encontrado.']);
-            exit;
+            responder(404, ['erro' => 'Instrutor não encontrado.']);
         }
 
-        echo json_encode([
+        responder(200, [
             'sucesso' => true,
             'mensagem' => 'Instrutor excluído com sucesso!'
-        ], JSON_UNESCAPED_UNICODE);
-        exit;
+        ]);
     }
 
-    http_response_code(405);
-    echo json_encode(['erro' => 'Método não permitido.']);
+    responder(405, ['erro' => 'Método não permitido.']);
 
 } catch (Throwable $erro) {
+
     error_log('Erro na API de instrutores: ' . $erro->getMessage());
 
-    http_response_code(500);
-    echo json_encode(['erro' => 'Erro interno ao processar os instrutores.']);
+    responder(500, [
+        'erro' => 'Erro interno ao processar os instrutores.'
+    ]);
 }

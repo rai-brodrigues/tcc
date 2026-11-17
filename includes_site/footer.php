@@ -2,7 +2,6 @@
 <footer class="footer-academia">
     <div class="footer-content">
 
-        <!-- IDENTIDADE -->
         <div class="footer-column footer-brand">
             <div class="footer-logo">
                 <i class="fas fa-dumbbell"></i>
@@ -20,7 +19,6 @@
             </div>
         </div>
 
-        <!-- NAVEGAÇÃO -->
         <div class="footer-column">
             <h5>Sistema</h5>
             <ul>
@@ -33,7 +31,6 @@
             </ul>
         </div>
 
-        <!-- FUNCIONALIDADES -->
         <div class="footer-column">
             <h5>Funcionalidades</h5>
             <ul>
@@ -45,7 +42,6 @@
             </ul>
         </div>
 
-        <!-- ACESSO -->
         <div class="footer-column">
             <h5>Acesso</h5>
 
@@ -53,16 +49,10 @@
                 Acesse sua conta para gerenciar os dados
                 e utilizar todos os recursos do FitControl.
             </p>
-
-            <a href="login/" class="footer-login">
-                <i class="fas fa-sign-in-alt"></i>
-                Entrar no sistema
-            </a>
         </div>
 
     </div>
 
-    <!-- PARTE INFERIOR -->
     <div class="footer-bottom">
         <p>
             &copy; <?php echo date("Y"); ?>
@@ -77,7 +67,6 @@
 </footer>
 
 <style>
-/* ESTRUTURA GERAL */
 html, body {
     min-height: 100%;
     margin: 0;
@@ -98,7 +87,6 @@ main {
     padding-bottom: 40px;
 }
 
-/* FOOTER */
 .footer-academia {
     flex-shrink: 0;
     margin-top: auto;
@@ -120,7 +108,6 @@ main {
     padding-bottom: 40px;
 }
 
-/* TÍTULOS */
 .footer-column h5 {
     color: #fff;
     font-size: 15px;
@@ -139,7 +126,6 @@ main {
     border-radius: 5px;
 }
 
-/* IDENTIDADE */
 .footer-logo {
     display: flex;
     align-items: center;
@@ -186,7 +172,6 @@ main {
     color: #ffd6d6;
 }
 
-/* LINKS */
 .footer-column ul {
     list-style: none;
     padding: 0;
@@ -211,7 +196,6 @@ main {
     padding-left: 5px;
 }
 
-/* BOTÃO DE LOGIN */
 .footer-login {
     display: inline-flex;
     align-items: center;
@@ -232,7 +216,6 @@ main {
     transform: translateY(-2px);
 }
 
-/* PARTE INFERIOR */
 .footer-bottom {
     max-width: 1200px;
     margin: 0 auto;
@@ -262,7 +245,6 @@ main {
     color: #ffd6d6;
 }
 
-/* TABLETS */
 @media (max-width: 900px) {
     .footer-content {
         grid-template-columns: repeat(2, 1fr);
@@ -270,7 +252,6 @@ main {
     }
 }
 
-/* CELULARES */
 @media (max-width: 550px) {
     .footer-academia {
         padding: 40px 22px 0;
