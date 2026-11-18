@@ -157,12 +157,90 @@ try {
     }
 
     if ($metodo === 'PUT') {
-        if ($perfil !== 'admin') {
-            responder(403, ['erro' => 'Somente o administrador pode editar avaliações.']);
-        }
 
-        responder(400, ['erro' => 'A edição de avaliações ainda não está implementada.']);
+    if ($perfil !== 'admin') {
+        responder(403, ['erro' => 'Somente o administrador pode editar avaliações.']);
     }
+
+    $dados = json_decode(file_get_contents('php://input'), true);
+
+    if (!is_array($dados)) {
+        responder(400, ['erro' => 'Dados inválidos.']);
+    }
+
+    $id = (int) ($dados['id'] ?? 0);
+    $aluno = (int) ($dados['aluno'] ?? 0);
+    $peso = (float) ($dados['peso'] ?? 0);
+    $altura = (float) ($dados['altura'] ?? 0);
+
+    $gorduraInformada = $dados['gordura'] ?? '';
+    $gordura = ($gorduraInformada === '')
+        ? null
+        : (float) $gorduraInformada;
+
+    if ($id <= 0 || $aluno <= 0 || $peso <= 0 || $altura <= 0) {
+        responder(400, ['erro' => 'Preencha corretamente os campos obrigatórios.']);
+    }
+
+    if ($gordura !== null && ($gordura < 0 || $gordura > 100)) {
+        responder(400, ['erro' => 'A gordura corporal deve estar entre 0 e 100%.']);
+    }
+
+    $verificar = $conexao->prepare("
+        SELECT id
+        FROM alunos
+        WHERE id = ?
+        AND id_academia = ?
+    ");
+
+    $verificar->bind_param('ii', $aluno, $idAcademia);
+    $verificar->execute();
+
+    if ($verificar->get_result()->num_rows === 0) {
+        responder(400, ['erro' => 'Aluno não encontrado nesta academia.']);
+    }
+
+    $verificarAvaliacao = $conexao->prepare("
+        SELECT id
+        FROM avaliacoes
+        WHERE id = ?
+        AND id_academia = ?
+    ");
+
+    $verificarAvaliacao->bind_param('ii', $id, $idAcademia);
+    $verificarAvaliacao->execute();
+
+    if ($verificarAvaliacao->get_result()->num_rows === 0) {
+        responder(404, ['erro' => 'Avaliação não encontrada.']);
+    }
+
+    $stmt = $conexao->prepare("
+        UPDATE avaliacoes
+        SET aluno_id = ?,
+            peso = ?,
+            altura = ?,
+            gordura = ?
+        WHERE id = ?
+        AND id_academia = ?
+    ");
+
+    $stmt->bind_param(
+        'idddii',
+        $aluno,
+        $peso,
+        $altura,
+        $gordura,
+        $id,
+        $idAcademia
+    );
+
+    $stmt->execute();
+
+    responder(200, [
+        'sucesso' => true,
+        'mensagem' => 'Avaliação atualizada com sucesso!'
+    ]);
+}
 
     if ($metodo === 'DELETE') {
 

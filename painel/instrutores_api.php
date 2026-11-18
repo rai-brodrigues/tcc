@@ -1,4 +1,3 @@
-
 <?php
 
 require_once __DIR__ . '/verifica_permissao.php';
@@ -150,6 +149,64 @@ try {
     }
 
     if ($metodo === 'DELETE') {
+
+
+    if ($metodo === 'PUT') {
+
+        if ($perfil !== 'admin') {
+            responder(403, ['erro' => 'Somente o administrador pode editar instrutores.']);
+        }
+
+        $dados = json_decode(file_get_contents('php://input'), true);
+
+        if (!is_array($dados)) {
+            responder(400, ['erro' => 'Dados inválidos.']);
+        }
+
+        $id = (int) ($dados['id'] ?? 0);
+        $nome = trim($dados['nome'] ?? '');
+        $especialidade = trim($dados['especialidade'] ?? '');
+
+        if ($id <= 0 || $nome === '') {
+            responder(400, ['erro' => 'Informe um ID válido e o nome do instrutor.']);
+        }
+
+        $stmt = $conexao->prepare("
+            UPDATE instrutores
+            SET nome = ?, especialidade = NULLIF(?, '')
+            WHERE id = ? AND id_academia = ?
+        ");
+
+        $stmt->bind_param(
+            'ssii',
+            $nome,
+            $especialidade,
+            $id,
+            $idAcademia
+        );
+
+        $stmt->execute();
+
+        if ($stmt->affected_rows === 0) {
+            $verificar = $conexao->prepare("
+                SELECT id FROM instrutores
+                WHERE id = ? AND id_academia = ?
+            ");
+
+            $verificar->bind_param('ii', $id, $idAcademia);
+            $verificar->execute();
+
+            if ($verificar->get_result()->num_rows === 0) {
+                responder(404, ['erro' => 'Instrutor não encontrado.']);
+            }
+        }
+
+        responder(200, [
+            'sucesso' => true,
+            'mensagem' => 'Instrutor atualizado com sucesso!'
+        ]);
+    }
+
 
         if ($perfil !== 'admin') {
             responder(403, ['erro' => 'Somente o administrador pode excluir instrutores.']);

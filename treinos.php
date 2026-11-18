@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/painel/verifica_login.php';
 
@@ -180,6 +179,87 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
 
     <?php endif; ?>
 
+
+
+    <?php if ($perfil === 'admin'): ?>
+
+    <div class="modal fade" id="modalEditarTreino" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: #1a1a1a; color: #fff;">
+
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Editar ficha de treino</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form id="formEditarTreino">
+
+                    <div class="modal-body">
+
+                        <input type="hidden" id="editarTreinoId">
+
+                        <div class="mb-3">
+                            <label class="form-label">Aluno</label>
+                            <select id="editarTreinoAluno" class="form-select" required>
+                                <option value="">Selecione um aluno</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Grupo muscular</label>
+                            <select id="editarTreinoGrupo" class="form-select" required>
+                                <option value="Peito">Peito</option>
+                                <option value="Costas">Costas</option>
+                                <option value="Pernas">Pernas</option>
+                                <option value="Ombros">Ombros</option>
+                                <option value="Bíceps">Bíceps</option>
+                                <option value="Tríceps">Tríceps</option>
+                                <option value="Abdômen">Abdômen</option>
+                                <option value="Cardio">Cardio</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Exercício</label>
+                            <input type="text" id="editarTreinoExercicio" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Séries</label>
+                            <input type="number" id="editarTreinoSeries" class="form-control" min="1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Repetições</label>
+                            <input type="text" id="editarTreinoRepeticoes" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Carga (kg)</label>
+                            <input type="number" id="editarTreinoCarga" class="form-control" min="0" step="0.1">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn btn-danger">
+                            Salvar alterações
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <?php endif; ?>
+
+
     <?php if (in_array($perfil, ['admin', 'instrutor', 'aluno'], true)): ?>
 
     <div class="card p-4 mt-4 shadow-sm">
@@ -198,6 +278,7 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
                         <th>Séries</th>
                         <th>Repetições</th>
                         <th>Carga</th>
+
                         <?php if ($perfil === 'admin'): ?>
                             <th>Ações</th>
                         <?php endif; ?>
@@ -214,6 +295,7 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
 
     <?php endif; ?>
 
+
     <?php if (!in_array($perfil, ['admin', 'instrutor', 'aluno'], true)): ?>
         <div class="card p-4 mt-4">
             <h5>Acesso não permitido</h5>
@@ -225,6 +307,7 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -234,6 +317,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <script>
     window.PERFIL_USUARIO = <?= json_encode($_SESSION['perfil'] ?? '') ?>;
 </script>
+
 <script src="<?php echo $base; ?>/includes_site/jsfitcontrol.js?v=7"></script>
 
 </body>

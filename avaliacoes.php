@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/painel/verifica_login.php';
+
 $perfil = $_SESSION['perfil'] ?? '';
+$base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -10,7 +12,7 @@ $perfil = $_SESSION['perfil'] ?? '';
     <title>Avaliações | Gestão de Monitoramento</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/css/estilo-global.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>/css/estilo-global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -110,9 +112,9 @@ $perfil = $_SESSION['perfil'] ?? '';
 
     <?php if (in_array($perfil, ['admin', 'instrutor'], true)): ?>
 
-<div class="card p-4 mt-4 shadow-sm">
+    <div class="card p-4 mt-4 shadow-sm">
 
-    <h5>Registrar avaliação</h5>
+        <h5>Registrar avaliação</h5>
 
         <form id="formAvaliacao" onsubmit="addAvaliacao(event)">
 
@@ -150,12 +152,100 @@ $perfil = $_SESSION['perfil'] ?? '';
             </button>
 
         </form>
-         
-         </div>
-
-<?php endif; ?>
 
     </div>
+
+    <?php endif; ?>
+
+
+
+    <?php if ($perfil === 'admin'): ?>
+
+    <div class="modal fade" id="modalEditarAvaliacao" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: #1a1a1a; color: #fff;">
+
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Editar avaliação física</h5>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <form id="formEditarAvaliacao">
+
+                    <div class="modal-body">
+
+                        <input type="hidden" id="editarAvaliacaoId">
+
+                        <div class="mb-3">
+                            <label class="form-label">Aluno</label>
+
+                            <select id="editarAvaliacaoAluno" class="form-select" required>
+                                <option value="">Selecione um aluno</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Peso (kg)</label>
+
+                            <input type="number"
+                                   id="editarAvaliacaoPeso"
+                                   class="form-control"
+                                   min="1"
+                                   step="0.1"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Altura (m)</label>
+
+                            <input type="number"
+                                   id="editarAvaliacaoAltura"
+                                   class="form-control"
+                                   min="0.5"
+                                   max="2.5"
+                                   step="0.01"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Gordura corporal (%)</label>
+
+                            <input type="number"
+                                   id="editarAvaliacaoGordura"
+                                   class="form-control"
+                                   min="0"
+                                   max="100"
+                                   step="0.1">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-secondary">
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn btn-danger">
+                            Salvar alterações
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <?php endif; ?>
+
 
     <div class="card p-4 mt-4 shadow-sm">
 
@@ -173,7 +263,10 @@ $perfil = $_SESSION['perfil'] ?? '';
                         <th>Altura</th>
                         <th>IMC</th>
                         <th>Gordura</th>
-                        <th>Ações</th>
+
+                        <?php if ($perfil === 'admin'): ?>
+                            <th>Ações</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
 
@@ -190,7 +283,12 @@ $perfil = $_SESSION['perfil'] ?? '';
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/tcc/includes_site/jsfitcontrol.js"></script>
+
+<script>
+    window.PERFIL_USUARIO = <?= json_encode($perfil) ?>;
+</script>
+
+<script src="<?php echo $base; ?>/includes_site/jsfitcontrol.js?v=8"></script>
 
 </body>
 </html>

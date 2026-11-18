@@ -1,4 +1,3 @@
-
 <footer class="footer-academia">
     <div class="footer-content">
 

@@ -35,6 +35,49 @@ function validarDataAgenda($data)
     return $data;
 }
 
+function validarHorarioFuncionamentoAgenda($inicio, $fim)
+{
+    if (!$inicio || !$fim) {
+        return '';
+    }
+
+    $dataInicio = new DateTime($inicio);
+    $dataFim = new DateTime($fim);
+
+    $diaSemana = (int) $dataInicio->format('N');
+
+    if ($diaSemana >= 6) {
+        return 'A academia não aceita agendamentos aos sábados e domingos.';
+    }
+
+    if ($dataInicio->format('Y-m-d') !== $dataFim->format('Y-m-d')) {
+        return 'O agendamento deve terminar no mesmo dia.';
+    }
+
+    $horaInicio = ((int) $dataInicio->format('H')) * 60
+        + (int) $dataInicio->format('i');
+
+    $horaFim = ((int) $dataFim->format('H')) * 60
+        + (int) $dataFim->format('i');
+
+    if ($horaInicio < 360 || $horaInicio >= 1320 || $horaFim > 1320) {
+        return 'O horário permitido é das 06h às 22h.';
+    }
+
+    if (
+        (int) $dataInicio->format('i') !== 0 ||
+        (int) $dataFim->format('i') !== 0
+    ) {
+        return 'Os agendamentos devem começar e terminar em horários cheios.';
+    }
+
+    if ($dataFim <= $dataInicio) {
+        return 'O horário final deve ser posterior ao inicial.';
+    }
+
+    return '';
+}
+
 function verificarAlunoAgenda($conexao, $idAluno, $idAcademia, $idInstrutor = null)
 {
     if ($idAluno <= 0) {
@@ -211,6 +254,7 @@ try {
         $descricao = trim($dados['descricao'] ?? '');
         $inicio = validarDataAgenda($dados['inicio'] ?? '');
         $fim = validarDataAgenda($dados['fim'] ?? '');
+        $erroHorario = validarHorarioFuncionamentoAgenda($inicio, $fim);
 
         $tiposPermitidos = [
             'treino',
@@ -220,16 +264,19 @@ try {
         ];
 
         if (
-            $titulo === '' ||
-            !in_array($tipo, $tiposPermitidos, true) ||
-            !$inicio ||
-            !$fim ||
-            strtotime($fim) <= strtotime($inicio)
-        ) {
-            responderAgenda(400, [
-                'erro' => 'Verifique o título, tipo, início e término do compromisso.'
-            ]);
-        }
+    $titulo === '' ||
+    !in_array($tipo, $tiposPermitidos, true) ||
+    !$inicio ||
+    !$fim ||
+    $erroHorario !== '' ||
+    strtotime($fim) <= strtotime($inicio)
+) {
+    responderAgenda(400, [
+        'erro' => $erroHorario !== ''
+            ? $erroHorario
+            : 'Verifique o título, tipo, início e término do compromisso.'
+    ]);
+}
 
         $idAluno = (int) ($dados['id_aluno'] ?? 0);
         $idInstrutor = (int) ($dados['id_instrutor'] ?? 0);
@@ -345,6 +392,7 @@ try {
         $descricao = trim($dados['descricao'] ?? '');
         $inicio = validarDataAgenda($dados['inicio'] ?? '');
         $fim = validarDataAgenda($dados['fim'] ?? '');
+        $erroHorario = validarHorarioFuncionamentoAgenda($inicio, $fim);
         $status = $dados['status'] ?? 'agendado';
 
         $tiposPermitidos = [
@@ -361,18 +409,21 @@ try {
         ];
 
         if (
-            $id <= 0 ||
-            $titulo === '' ||
-            !in_array($tipo, $tiposPermitidos, true) ||
-            !in_array($status, $statusPermitidos, true) ||
-            !$inicio ||
-            !$fim ||
-            strtotime($fim) <= strtotime($inicio)
-        ) {
-            responderAgenda(400, [
-                'erro' => 'Dados do agendamento inválidos.'
-            ]);
-        }
+    $id <= 0 ||
+    $titulo === '' ||
+    !in_array($tipo, $tiposPermitidos, true) ||
+    !in_array($status, $statusPermitidos, true) ||
+    !$inicio ||
+    !$fim ||
+    $erroHorario !== '' ||
+    strtotime($fim) <= strtotime($inicio)
+) {
+    responderAgenda(400, [
+        'erro' => $erroHorario !== ''
+            ? $erroHorario
+            : 'Dados do agendamento inválidos.'
+    ]);
+}
 
         $idAluno = (int) ($dados['id_aluno'] ?? 0);
 

@@ -356,7 +356,7 @@ if ($erroPerfil) {
                 <div class="cadastro-container">
                     <p>Não tem uma conta?</p>
 
-                    <a href="../cadastro.php" class="btn-cadastro">
+                    <a href="../cadastro.php" class="btn-cadastro" id="linkCadastro">
                         <i class="fa fa-user-plus"></i>
                         Cadastre-se aqui
                     </a>
@@ -389,6 +389,9 @@ if ($erroPerfil) {
     function selecionarPerfil(perfil, nomePerfil) {
 
         document.getElementById('perfilEscolhido').value = perfil;
+
+        document.getElementById('linkCadastro').href =
+    '../cadastro.php?perfil=' + encodeURIComponent(perfil);
 
         document.getElementById('tituloPerfil').textContent =
             'ENTRAR COMO ' + nomePerfil;

@@ -442,14 +442,103 @@ async function addTreino(event) {
     }
 }
 
+
+function editarTreino(id) {
+    const treino = treinos.find(t => Number(t.id) === Number(id));
+
+    if (!treino) {
+        alert('Treino não encontrado.');
+        return;
+    }
+
+    const modal = document.getElementById('modalEditarTreino');
+
+    if (!modal || typeof bootstrap === 'undefined') {
+        alert('A janela de edição não foi encontrada.');
+        return;
+    }
+
+    document.getElementById('editarTreinoId').value = treino.id;
+
+    preencherAlunos('editarTreinoAluno');
+
+    document.getElementById('editarTreinoAluno').value = treino.aluno;
+    document.getElementById('editarTreinoGrupo').value = treino.grupo;
+    document.getElementById('editarTreinoExercicio').value = treino.exercicio;
+    document.getElementById('editarTreinoSeries').value = treino.series;
+    document.getElementById('editarTreinoRepeticoes').value = treino.repeticoes;
+    document.getElementById('editarTreinoCarga').value = treino.carga || 0;
+
+    bootstrap.Modal.getOrCreateInstance(modal).show();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const formulario = document.getElementById('formEditarTreino');
+
+    if (!formulario) return;
+
+    formulario.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const botao = formulario.querySelector('button[type="submit"]');
+        const textoOriginal = botao.textContent;
+
+        const dados = {
+            id: document.getElementById('editarTreinoId').value,
+            aluno: document.getElementById('editarTreinoAluno').value,
+            grupo: document.getElementById('editarTreinoGrupo').value,
+            exercicio: document.getElementById('editarTreinoExercicio').value.trim(),
+            series: document.getElementById('editarTreinoSeries').value,
+            repeticoes: document.getElementById('editarTreinoRepeticoes').value.trim(),
+            carga: document.getElementById('editarTreinoCarga').value
+        };
+
+        if (!dados.aluno || !dados.exercicio || !dados.series || !dados.repeticoes) {
+            alert('Preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        try {
+            botao.disabled = true;
+            botao.textContent = 'Salvando...';
+
+            const resposta = await fetch(API_TREINOS, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(resultado.erro || 'Não foi possível atualizar o treino.');
+            }
+
+            const modal = document.getElementById('modalEditarTreino');
+            bootstrap.Modal.getOrCreateInstance(modal).hide();
+
+            await carregarTreinos();
+
+            alert('Treino atualizado com sucesso!');
+        } catch (erro) {
+            alert(erro.message);
+        } finally {
+            botao.disabled = false;
+            botao.textContent = textoOriginal;
+        }
+    });
+});
+
+
+
 function renderTreinos() {
     const tabela = document.getElementById('listaTreinos');
 
     if (!tabela) return;
 
     const ehAdmin = window.PERFIL_USUARIO === 'admin';
-
-    console.log('Perfil recebido:', window.PERFIL_USUARIO);
 
     preencherAlunos('alunoTreino');
 
@@ -461,12 +550,19 @@ function renderTreinos() {
             <td>${esc(treino.series)}</td>
             <td>${esc(treino.repeticoes)}</td>
             <td>${esc(treino.carga || 'Não informada')} kg</td>
+
             ${ehAdmin ? `
                 <td>
                     <button
+                        class="btn btn-sm btn-primary mb-1"
+                        onclick="editarTreino(${Number(treino.id)})">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+
+                    <button
                         class="btn btn-sm btn-danger"
                         onclick="excluirTreino(${Number(treino.id)})">
-                        Excluir
+                        <i class="fas fa-trash"></i> Excluir
                     </button>
                 </td>
             ` : ''}
@@ -479,6 +575,7 @@ function renderTreinos() {
         </tr>
     `;
 }
+
 
 async function excluirTreino(id) {
     if (!confirm('Deseja excluir este treino?')) return;
@@ -573,6 +670,7 @@ async function addAvaliacao(event) {
     }
 }
 
+
 function renderAvaliacoes() {
     const tabela = document.getElementById('listaAvaliacoes');
 
@@ -597,9 +695,15 @@ function renderAvaliacoes() {
             ${ehAdmin ? `
                 <td>
                     <button
+                        class="btn btn-sm btn-primary mb-1"
+                        onclick="editarAvaliacao(${Number(avaliacao.id)})">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+
+                    <button
                         class="btn btn-sm btn-danger"
                         onclick="excluirAvaliacao(${Number(avaliacao.id)})">
-                        Excluir
+                        <i class="fas fa-trash"></i> Excluir
                     </button>
                 </td>
             ` : ''}
@@ -612,6 +716,34 @@ function renderAvaliacoes() {
         </tr>
     `;
 }
+
+
+function editarAvaliacao(id) {
+    if (window.PERFIL_USUARIO !== 'admin') return;
+
+    const avaliacao = avaliacoes.find(item => Number(item.id) === Number(id));
+
+    if (!avaliacao) {
+        alert('Avaliação não encontrada.');
+        return;
+    }
+
+    document.getElementById('editarAvaliacaoId').value = avaliacao.id;
+
+    preencherAlunos('editarAvaliacaoAluno');
+    document.getElementById('editarAvaliacaoAluno').value = avaliacao.aluno;
+
+    document.getElementById('editarAvaliacaoPeso').value = avaliacao.peso;
+    document.getElementById('editarAvaliacaoAltura').value = avaliacao.altura;
+    document.getElementById('editarAvaliacaoGordura').value = avaliacao.gordura ?? '';
+
+    const modal = new bootstrap.Modal(
+        document.getElementById('modalEditarAvaliacao')
+    );
+
+    modal.show();
+}
+
 
 async function excluirAvaliacao(id) {
     if (!confirm('Deseja excluir esta avaliação?')) return;
@@ -663,31 +795,69 @@ async function carregarInstrutores() {
     }
 }
 
+
 function renderInstrutores() {
     const tabela = document.getElementById('listaInstrutores');
 
     if (!tabela) return;
 
+    const ehAdmin = window.PERFIL_USUARIO === 'admin';
+
     tabela.innerHTML = instrutores.map(instrutor => `
         <tr>
             <td>${esc(instrutor.nome)}</td>
             <td>${esc(instrutor.especialidade || 'Não informada')}</td>
-            <td>
-                <button
-                    class="btn btn-sm btn-danger"
-                    onclick="excluirInstrutor(${Number(instrutor.id)})">
-                    Excluir
-                </button>
-            </td>
+
+            ${ehAdmin ? `
+                <td>
+                    <button
+                        class="btn btn-sm btn-primary mb-1"
+                        onclick="editarInstrutor(${Number(instrutor.id)})">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+
+                    <button
+                        class="btn btn-sm btn-danger"
+                        onclick="excluirInstrutor(${Number(instrutor.id)})">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </td>
+            ` : ''}
         </tr>
     `).join('') || `
         <tr>
-            <td colspan="3" class="text-center">
+            <td colspan="${ehAdmin ? 3 : 2}" class="text-center">
                 Nenhum instrutor cadastrado.
             </td>
         </tr>
     `;
 }
+
+
+function editarInstrutor(id) {
+    if (window.PERFIL_USUARIO !== 'admin') return;
+
+    const instrutor = instrutores.find(
+        item => Number(item.id) === Number(id)
+    );
+
+    if (!instrutor) {
+        alert('Instrutor não encontrado.');
+        return;
+    }
+
+    document.getElementById('editarInstrutorId').value = instrutor.id;
+    document.getElementById('editarInstrutorNome').value = instrutor.nome;
+    document.getElementById('editarInstrutorEspecialidade').value =
+        instrutor.especialidade || '';
+
+    const modal = new bootstrap.Modal(
+        document.getElementById('modalEditarInstrutor')
+    );
+
+    modal.show();
+}
+
 
 async function addInstrutor(event) {
     event.preventDefault();
@@ -841,4 +1011,118 @@ document.addEventListener('DOMContentLoaded', () => {
     renderRelatorios();
 
     carregarAlunos();
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const formulario = document.getElementById('formEditarAvaliacao');
+
+    if (!formulario) return;
+
+    formulario.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        if (window.PERFIL_USUARIO !== 'admin') {
+            alert('Você não tem permissão para editar avaliações.');
+            return;
+        }
+
+        const dados = {
+            id: document.getElementById('editarAvaliacaoId').value,
+            aluno: document.getElementById('editarAvaliacaoAluno').value,
+            peso: document.getElementById('editarAvaliacaoPeso').value,
+            altura: document.getElementById('editarAvaliacaoAltura').value,
+            gordura: document.getElementById('editarAvaliacaoGordura').value
+        };
+
+        if (!dados.id || !dados.aluno || !dados.peso || !dados.altura) {
+            alert('Preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        try {
+            const resposta = await fetch(API_AVALIACOES, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(resultado.erro || 'Não foi possível atualizar a avaliação.');
+            }
+
+            alert(resultado.mensagem || 'Avaliação atualizada com sucesso!');
+
+            const modalElemento = document.getElementById('modalEditarAvaliacao');
+            const modal = bootstrap.Modal.getInstance(modalElemento);
+
+            if (modal) modal.hide();
+
+            await carregarAvaliacoes();
+
+        } catch (erro) {
+            console.error('Erro ao editar avaliação:', erro);
+            alert(erro.message);
+        }
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const formulario = document.getElementById('formEditarInstrutor');
+
+    if (!formulario) return;
+
+    formulario.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        if (window.PERFIL_USUARIO !== 'admin') {
+            alert('Você não tem permissão para editar instrutores.');
+            return;
+        }
+
+        const dados = {
+            id: document.getElementById('editarInstrutorId').value,
+            nome: document.getElementById('editarInstrutorNome').value.trim(),
+            especialidade: document.getElementById('editarInstrutorEspecialidade').value.trim()
+        };
+
+        if (!dados.id || !dados.nome) {
+            alert('Informe o nome do instrutor.');
+            return;
+        }
+
+        try {
+            const resposta = await fetch(API_INSTRUTORES, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(resultado.erro || 'Não foi possível atualizar o instrutor.');
+            }
+
+            alert(resultado.mensagem || 'Instrutor atualizado com sucesso!');
+
+            const modalElemento = document.getElementById('modalEditarInstrutor');
+            const modal = bootstrap.Modal.getInstance(modalElemento);
+
+            if (modal) modal.hide();
+
+            await carregarInstrutores();
+
+        } catch (erro) {
+            console.error('Erro ao editar instrutor:', erro);
+            alert(erro.message);
+        }
+    });
 });

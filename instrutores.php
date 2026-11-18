@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/painel/verifica_login.php';
 
@@ -193,6 +192,69 @@ $perfil = $_SESSION['perfil'] ?? '';
 </main>
 
 <?php include __DIR__ . '/includes_site/footer.php'; ?>
+
+
+<?php if ($perfil === 'admin'): ?>
+
+<div class="modal fade" id="modalEditarInstrutor" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #1a1a1a; color: #fff;">
+
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Editar instrutor</h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <form id="formEditarInstrutor">
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="editarInstrutorId">
+
+                    <div class="mb-3">
+                        <label class="form-label">Nome do instrutor</label>
+                        <input type="text"
+                               id="editarInstrutorNome"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Especialidade</label>
+                        <input type="text"
+                               id="editarInstrutorEspecialidade"
+                               class="form-control"
+                               placeholder="Ex: Musculação, Funcional, Cardio">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer border-secondary">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+                        Salvar alterações
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<?php endif; ?>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ? '/tcc' : ''); ?>/includes_site/jsfitcontrol.js?v=6"></script>

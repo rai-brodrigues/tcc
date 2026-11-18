@@ -19,6 +19,43 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
     <style>
+        .fc .fc-daygrid-day.dia-aberto {
+            background-color: rgba(25, 135, 84, 0.10);
+        }
+
+        .fc .fc-daygrid-day.dia-fechado {
+            background-color: rgba(220, 53, 69, 0.13);
+        }
+
+        .legenda-agenda {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 18px;
+            color: #fff;
+        }
+
+        .legenda-agenda span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .indicador-aberto,
+        .indicador-fechado {
+            width: 13px;
+            height: 13px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .indicador-aberto {
+            background-color: #198754;
+        }
+
+        .indicador-fechado {
+            background-color: #dc3545;
+        }
         body {
             background-color: #111 !important;
             color: #fff;
@@ -296,6 +333,18 @@ $base = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '/tcc' : '';
             Calendário de compromissos
         </h5>
 
+        <div class="legenda-agenda">
+    <span>
+        <i class="indicador-aberto"></i>
+        Segunda a sexta: 06h às 22h
+    </span>
+
+    <span>
+        <i class="indicador-fechado"></i>
+        Sábado e domingo: fechado
+    </span>
+</div>
+
         <div id="mensagemAgenda" class="mb-3"></div>
 
         <div id="calendario"></div>
@@ -496,6 +545,46 @@ document.addEventListener('DOMContentLoaded', function () {
         mensagem.appendChild(alerta);
     }
 
+    function validarHorarioAcademia(inicio, fim) {
+    if (!inicio || !fim) {
+        return 'Informe a data e os horários.';
+    }
+
+    const dataInicio = new Date(inicio);
+    const dataFim = new Date(fim);
+
+    if (isNaN(dataInicio.getTime()) || isNaN(dataFim.getTime())) {
+        return 'Informe datas e horários válidos.';
+    }
+
+    const dia = dataInicio.getDay();
+
+    if (dia === 0 || dia === 6) {
+        return 'A academia não aceita agendamentos aos sábados e domingos.';
+    }
+
+    if (dataFim.toDateString() !== dataInicio.toDateString()) {
+        return 'O agendamento deve terminar no mesmo dia.';
+    }
+
+    const horaInicio = dataInicio.getHours() * 60 + dataInicio.getMinutes();
+    const horaFim = dataFim.getHours() * 60 + dataFim.getMinutes();
+
+    if (horaInicio < 360 || horaInicio >= 1320 || horaFim > 1320) {
+        return 'O horário permitido é das 06h às 22h.';
+    }
+
+    if (dataInicio.getMinutes() !== 0 || dataFim.getMinutes() !== 0) {
+        return 'Os agendamentos devem começar e terminar em horários cheios.';
+    }
+
+    if (dataFim <= dataInicio) {
+        return 'O horário final deve ser posterior ao inicial.';
+    }
+
+    return '';
+}
+
     function limparMensagem() {
         mensagem.innerHTML = '';
     }
@@ -620,6 +709,25 @@ document.addEventListener('DOMContentLoaded', function () {
         calendario = new FullCalendar.Calendar(calendarioElemento, {
 
             initialView: 'dayGridMonth',
+
+            businessHours: {
+    daysOfWeek: [1, 2, 3, 4, 5],
+    startTime: '06:00',
+    endTime: '22:00'
+},
+
+slotMinTime: '06:00:00',
+slotMaxTime: '22:00:00',
+
+dayCellClassNames: function(info) {
+    const dia = info.date.getDay();
+
+    if (dia === 0 || dia === 6) {
+        return ['dia-fechado'];
+    }
+
+    return ['dia-aberto'];
+},
 
             locale: 'pt-br',
 
@@ -776,30 +884,53 @@ document.addEventListener('DOMContentLoaded', function () {
             },
 
             dateClick: function (info) {
+    if (!['admin', 'instrutor'].includes(perfil)) return;
 
-                if (!['admin', 'instrutor'].includes(perfil)) {
-                    return;
-                }
+    const dia = info.date.getDay();
 
-                const inicio = document.getElementById('inicioAgenda');
+    if (dia === 0 || dia === 6) {
+        mostrarMensagem('A academia não funciona aos sábados e domingos.');
+        return;
+    }
 
-                if (inicio) {
+    const inicio = document.getElementById('inicioAgenda');
+    const fim = document.getElementById('fimAgenda');
 
-                    inicio.value = info.dateStr.length === 10
-                        ? info.dateStr + 'T08:00'
-                        : info.dateStr.substring(0, 16);
+    if (!inicio || !fim) return;
 
-                    document.getElementById('fimAgenda').value =
-                        inicio.value.substring(0, 11) + '09:00';
+    let dataInicio;
 
-                    document.getElementById('tituloAgenda').focus();
+    if (info.dateStr.length === 10) {
+        dataInicio = info.dateStr + 'T08:00';
+    } else {
+        const hora = info.date.getHours();
 
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                }
-            }
+        if (hora < 6 || hora >= 22) {
+            mostrarMensagem('Os agendamentos são permitidos das 06h às 22h.');
+            return;
+        }
+
+        dataInicio = info.dateStr.substring(0, 16);
+    }
+
+    const dataFim = new Date(dataInicio);
+    dataFim.setHours(dataFim.getHours() + 1);
+
+    if (dataFim.getHours() > 22 || dataFim.getHours() === 22 && dataFim.getMinutes() > 0) {
+        mostrarMensagem('Não há horários disponíveis após as 22h.');
+        return;
+    }
+
+    inicio.value = dataInicio;
+    fim.value = dataFim.getFullYear() + '-' +
+        String(dataFim.getMonth() + 1).padStart(2, '0') + '-' +
+        String(dataFim.getDate()).padStart(2, '0') + 'T' +
+        String(dataFim.getHours()).padStart(2, '0') + ':' +
+        String(dataFim.getMinutes()).padStart(2, '0');
+
+    document.getElementById('tituloAgenda').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
         });
 
@@ -840,17 +971,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('instrutorAgenda').value || null;
             }
 
-            if (
-                !dados.titulo ||
-                !dados.inicio ||
-                !dados.fim ||
-                new Date(dados.fim) <= new Date(dados.inicio)
-            ) {
+            const erroHorarioCadastro = validarHorarioAcademia(
+                dados.inicio,
+                dados.fim
+            );
 
+            if (!dados.titulo || erroHorarioCadastro) {
                 mostrarMensagem(
-                    'Preencha os campos obrigatórios e verifique os horários.'
+                    erroHorarioCadastro || 'Preencha o título do agendamento.',
+                    'danger'
                 );
-
                 return;
             }
 
@@ -913,18 +1043,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('editarInstrutorAgenda').value || null;
         }
 
-        if (
-            !dados.id ||
-            !dados.titulo ||
-            !dados.inicio ||
-            !dados.fim ||
-            new Date(dados.fim) <= new Date(dados.inicio)
-        ) {
+        const erroHorarioEdicao = validarHorarioAcademia(
+            dados.inicio,
+            dados.fim
+        );
 
+        if (!dados.id || !dados.titulo || erroHorarioEdicao) {
             mostrarMensagemEdicao(
-                'Preencha os campos obrigatórios e verifique os horários.'
+                erroHorarioEdicao || 'Preencha o título do agendamento.',
+                'danger'
             );
-
             return;
         }
 
